@@ -5,7 +5,8 @@ require("dotenv").config();
 const productRoutes = require("./routes/productRoutes");
 const saleRoutes = require("./routes/saleRoutes");
 const reportRoutes = require("./routes/reportRoutes");
-const authRoutes = require("./routes/authRoutes"); // 👈 FALTA ESTO
+const authRoutes = require("./routes/authRoutes");
+const clientRoutes = require("./routes/clientRoutes");
 
 const app = express();
 
@@ -18,12 +19,11 @@ app.get("/", (req, res) => {
   });
 });
 
-// 👇 CONECTAR AUTH
 app.use("/api/auth", authRoutes);
-
 app.use("/api/products", productRoutes);
 app.use("/api/sales", saleRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/clients", clientRoutes);
 
 const PORT = process.env.PORT || 3000;
 
