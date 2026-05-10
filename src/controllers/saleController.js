@@ -126,9 +126,9 @@ const getSales = async (req, res) => {
         s.id AS sale_id,
         s.total,
         s.created_at,
+        s.payment_method,
         u.name AS user_name,
-        pm.name AS payment_method,
-
+        c.name AS client_name,
         COALESCE(
           json_agg(
             json_build_object(
@@ -140,21 +140,16 @@ const getSales = async (req, res) => {
           ) FILTER (WHERE si.id IS NOT NULL),
           '[]'
         ) AS items
-
       FROM sales s
       JOIN users u ON s.user_id = u.id
-
+      LEFT JOIN clients c ON s.client_id = c.id
       LEFT JOIN payment_methods pm ON pm.id = s.payment_method_id
-
       LEFT JOIN sale_items si ON s.id = si.sale_id
       LEFT JOIN products p ON si.product_id = p.id
-
-      GROUP BY s.id, u.name, pm.name
+      GROUP BY s.id, u.name, c.name
       ORDER BY s.id DESC
     `);
-
     res.json(result.rows);
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error obteniendo ventas" });
@@ -173,6 +168,7 @@ const getSaleById = async (req, res) => {
         s.payment_method,
         s.created_at,
         u.name AS user_name,
+        c.name AS client_name,
         COALESCE(
           json_agg(
             json_build_object(
