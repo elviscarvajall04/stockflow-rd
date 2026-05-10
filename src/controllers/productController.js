@@ -43,7 +43,7 @@ const getProductById = async (req, res) => {
 
 const createProduct = async (req, res) => {
   try {
-    const { name, price, stock } = req.body;
+    const { name, price, stock, itbis } = req.body;
     if (!name || name.trim() === "") {
       return res.status(400).json({ message: "El nombre es obligatorio" });
     }
@@ -53,9 +53,10 @@ const createProduct = async (req, res) => {
     if (stock == null || stock < 0) {
       return res.status(400).json({ message: "El stock no puede ser negativo" });
     }
+    const itbisValue = itbis != null ? itbis : 18.00;
     const result = await pool.query(
-      "INSERT INTO products (name, price, stock, active) VALUES ($1, $2, $3, true) RETURNING *",
-      [name, price, stock]
+      "INSERT INTO products (name, price, stock, itbis, active) VALUES ($1, $2, $3, $4, true) RETURNING *",
+      [name, price, stock, itbisValue]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
@@ -67,7 +68,7 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, stock } = req.body;
+    const { name, price, stock, itbis } = req.body;
     if (!name || name.trim() === "") {
       return res.status(400).json({ message: "El nombre es obligatorio" });
     }
@@ -77,9 +78,10 @@ const updateProduct = async (req, res) => {
     if (stock == null || stock < 0) {
       return res.status(400).json({ message: "El stock no puede ser negativo" });
     }
+    const itbisValue = itbis != null ? itbis : 18.00;
     const result = await pool.query(
-      "UPDATE products SET name = $1, price = $2, stock = $3 WHERE id = $4 AND active = true RETURNING *",
-      [name, price, stock, id]
+      "UPDATE products SET name = $1, price = $2, stock = $3, itbis = $4 WHERE id = $5 AND active = true RETURNING *",
+      [name, price, stock, itbisValue, id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Producto no encontrado" });

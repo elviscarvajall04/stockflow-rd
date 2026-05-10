@@ -14,14 +14,21 @@ const getDashboardReport = async (req, res) => {
       "SELECT COALESCE(SUM(total), 0) AS total_revenue FROM sales"
     );
 
+    const itbisCollectedResult = await pool.query(
+      "SELECT COALESCE(SUM(itbis_total), 0) AS total_itbis FROM sales"
+    );
+
     const lowStockResult = await pool.query(
-      "SELECT COUNT(*) FROM products WHERE stock <= 5"
+      "SELECT COUNT(*) FROM products WHERE stock <= 5 AND active = true"
     );
 
     const recentSalesResult = await pool.query(`
-      SELECT 
+      SELECT
         s.id,
         s.total,
+        s.subtotal,
+        s.itbis_total,
+        s.ncf,
         s.created_at,
         u.name AS user_name
       FROM sales s
@@ -34,6 +41,7 @@ const getDashboardReport = async (req, res) => {
       total_products: Number(totalProductsResult.rows[0].count),
       total_sales: Number(totalSalesResult.rows[0].count),
       total_revenue: Number(totalRevenueResult.rows[0].total_revenue),
+      total_itbis: Number(itbisCollectedResult.rows[0].total_itbis),
       low_stock_products: Number(lowStockResult.rows[0].count),
       recent_sales: recentSalesResult.rows,
     });

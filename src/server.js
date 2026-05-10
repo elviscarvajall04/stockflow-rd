@@ -7,6 +7,8 @@ const saleRoutes = require("./routes/saleRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const authRoutes = require("./routes/authRoutes");
 const clientRoutes = require("./routes/clientRoutes");
+const companyRoutes = require("./routes/companyRoutes");
+const ncfRoutes = require("./routes/ncfRoutes");
 
 const app = express();
 
@@ -24,6 +26,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/sales", saleRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/clients", clientRoutes);
+app.use("/api/company", companyRoutes);
+app.use("/api/ncf", ncfRoutes);
 
 const PORT = process.env.PORT || 3000;
 
