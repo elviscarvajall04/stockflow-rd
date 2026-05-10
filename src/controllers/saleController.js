@@ -222,7 +222,6 @@ const getSaleById = async (req, res) => {
         s.created_at,
         u.name AS user_name,
         c.name AS client_name,
-        cl.rnc AS client_rnc,
         COALESCE(
           json_agg(
             json_build_object(
@@ -241,9 +240,8 @@ const getSaleById = async (req, res) => {
       LEFT JOIN clients c ON s.client_id = c.id
       LEFT JOIN sale_items si ON s.id = si.sale_id
       LEFT JOIN products p ON si.product_id = p.id
-      LEFT JOIN clients cl ON s.client_id = cl.id
       WHERE s.id = $1
-      GROUP BY s.id, u.name, c.name, cl.rnc
+      GROUP BY s.id, u.name, c.name
       `,
       [id]
     );

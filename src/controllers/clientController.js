@@ -106,9 +106,21 @@ const updateClient = async (req, res) => {
 const deleteClient = async (req, res) => {
   const { id } = req.params;
   try {
+    const salesCheck = await pool.query(
+      "SELECT COUNT(*) FROM sales WHERE client_id = $1",
+      [id]
+    );
+
+    if (parseInt(salesCheck.rows[0].count) > 0) {
+      return res.status(400).json({
+        message: "No se puede eliminar el cliente porque tiene ventas registradas. Puedes desactivarlo o editar sus datos en lugar de eliminarlo.",
+      });
+    }
+
     await pool.query("DELETE FROM clients WHERE id = $1", [id]);
     res.json({ message: "Cliente eliminado correctamente" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error eliminando cliente" });
   }
 };
