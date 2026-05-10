@@ -4,7 +4,13 @@ const createSale = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const { user_id, items } = req.body;
+    const {
+      user_id,
+      items,
+      payment_method,
+      payment_method_id,
+      client_id,
+    } = req.body;
 
     if (!user_id) {
       return res.status(400).json({ message: "El usuario es obligatorio" });
@@ -66,16 +72,32 @@ const createSale = async (req, res) => {
       );
     }
 
+    // 🔴 INSERT SALE CON PAYMENT METHOD
     const saleResult = await client.query(
-      "INSERT INTO sales (user_id, total) VALUES ($1, $2) RETURNING *",
-      [user_id, total]
+      `
+      INSERT INTO sales 
+      (user_id, client_id, total, payment_method, payment_method_id)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+      `,
+      [
+        user_id,
+        client_id || null,
+        total,
+        payment_method || "efectivo",
+        payment_method_id || null,
+      ]
     );
 
     const sale = saleResult.rows[0];
 
     for (const item of saleItems) {
       await client.query(
-        "INSERT INTO sale_items (sale_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)",
+        `
+        INSERT INTO sale_items 
+        (sale_id, product_id, quantity, price)
+        VALUES ($1, $2, $3, $4)
+        `,
         [sale.id, item.product_id, item.quantity, item.price]
       );
     }
@@ -87,6 +109,7 @@ const createSale = async (req, res) => {
       sale,
       items: saleItems,
     });
+
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -104,6 +127,8 @@ const getSales = async (req, res) => {
         s.total,
         s.created_at,
         u.name AS user_name,
+        pm.name AS payment_method,
+
         COALESCE(
           json_agg(
             json_build_object(
@@ -115,15 +140,21 @@ const getSales = async (req, res) => {
           ) FILTER (WHERE si.id IS NOT NULL),
           '[]'
         ) AS items
+
       FROM sales s
       JOIN users u ON s.user_id = u.id
+
+      LEFT JOIN payment_methods pm ON pm.id = s.payment_method_id
+
       LEFT JOIN sale_items si ON s.id = si.sale_id
       LEFT JOIN products p ON si.product_id = p.id
-      GROUP BY s.id, u.name
+
+      GROUP BY s.id, u.name, pm.name
       ORDER BY s.id DESC
     `);
 
     res.json(result.rows);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error obteniendo ventas" });
@@ -139,6 +170,7 @@ const getSaleById = async (req, res) => {
       SELECT 
         s.id AS sale_id,
         s.total,
+        s.payment_method,
         s.created_at,
         u.name AS user_name,
         COALESCE(
@@ -168,6 +200,7 @@ const getSaleById = async (req, res) => {
     }
 
     res.json(result.rows[0]);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error obteniendo venta" });
