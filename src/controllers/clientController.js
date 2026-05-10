@@ -14,13 +14,21 @@ const getClients = async (req, res) => {
 // Obtener un cliente por ID con su historial de compras
 const getClientById = async (req, res) => {
   const { id } = req.params;
+
   try {
+    console.log("CLIENT ID:", id);
+
     const client = await pool.query(
       "SELECT * FROM clients WHERE id = $1",
       [id]
     );
+
+    console.log("CLIENT RESULT:", client.rows);
+
     if (client.rows.length === 0) {
-      return res.status(404).json({ message: "Cliente no encontrado" });
+      return res.status(404).json({
+        message: "Cliente no encontrado",
+      });
     }
 
     const sales = await pool.query(
@@ -35,10 +43,18 @@ const getClientById = async (req, res) => {
     res.json({
       ...client.rows[0],
       sales: sales.rows,
-      total_spent: sales.rows.reduce((sum, s) => sum + Number(s.total), 0),
+      total_spent: sales.rows.reduce(
+        (sum, s) => sum + Number(s.total),
+        0
+      ),
     });
   } catch (error) {
-    res.status(500).json({ message: "Error obteniendo cliente" });
+    console.error("GET CLIENT ERROR:", error);
+
+    res.status(500).json({
+      message: "Error obteniendo cliente",
+      error: error.message,
+    });
   }
 };
 
@@ -58,7 +74,13 @@ const createClient = async (req, res) => {
       client: result.rows[0],
     });
   } catch (error) {
-    res.status(500).json({ message: "Error creando cliente" });
+console.error("CREATE CLIENT ERROR:", error);
+
+
+    res.status(500).json({ 
+    
+        message: "Error creando cliente", error: error.message,
+     });
   }
 };
 
