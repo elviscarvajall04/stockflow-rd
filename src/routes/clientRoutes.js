@@ -7,8 +7,8 @@ const {
   updateClient,
   deleteClient,
 } = require("../controllers/clientController");
-const { verifyToken } = require("../middlewares/authMiddleware");
-const { authorizeRoles } = require("../middlewares/roleMiddleware");
+const verifyToken = require("../middlewares/authMiddleware");
+const authorizeRoles = require("../middlewares/roleMiddleware");
 
 router.get("/", verifyToken, getClients);
 router.get("/:id", verifyToken, getClientById);

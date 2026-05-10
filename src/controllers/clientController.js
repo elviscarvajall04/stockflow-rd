@@ -1,5 +1,4 @@
-const pool = require("../../config/db");
-
+const pool = require("../config/db");
 // Obtener todos los clientes
 const getClients = async (req, res) => {
   try {
