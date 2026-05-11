@@ -26,9 +26,10 @@ CREATE TABLE IF NOT EXISTS company_settings (
   currency VARCHAR(10) DEFAULT 'RD$',
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- Solo insertar default si no hay ninguna fila
 INSERT INTO company_settings (company_name, rnc)
-VALUES ('Mi Empresa', '')
-ON CONFLICT DO NOTHING;
+SELECT 'Mi Empresa', ''
+WHERE NOT EXISTS (SELECT 1 FROM company_settings);
 
 -- NCF sequences
 CREATE TABLE IF NOT EXISTS ncf_sequences (
