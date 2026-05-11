@@ -2,11 +2,21 @@ const pool = require("../config/db");
 // Obtener todos los clientes
 const getClients = async (req, res) => {
   try {
-    const result = await pool.query(
-      "SELECT * FROM clients ORDER BY created_at DESC"
-    );
+    const result = await pool.query(`
+      SELECT c.*,
+        COALESCE(s.sales_count, 0) AS sales_count
+      FROM clients c
+      LEFT JOIN (
+        SELECT client_id, COUNT(*) AS sales_count
+        FROM sales
+        WHERE client_id IS NOT NULL
+        GROUP BY client_id
+      ) s ON s.client_id = c.id
+      ORDER BY c.created_at DESC
+    `);
     res.json(result.rows);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error obteniendo clientes" });
   }
 };
@@ -111,14 +121,23 @@ const deleteClient = async (req, res) => {
       [id]
     );
 
-    if (parseInt(salesCheck.rows[0].count) > 0) {
-      return res.status(400).json({
-        message: "No se puede eliminar el cliente porque tiene ventas registradas. Puedes desactivarlo o editar sus datos en lugar de eliminarlo.",
-      });
+    const salesCount = parseInt(salesCheck.rows[0].count);
+
+    if (salesCount > 0) {
+      // Desvincular ventas del cliente (client_id = NULL)
+      await pool.query(
+        "UPDATE sales SET client_id = NULL WHERE client_id = $1",
+        [id]
+      );
     }
 
     await pool.query("DELETE FROM clients WHERE id = $1", [id]);
-    res.json({ message: "Cliente eliminado correctamente" });
+
+    const message = salesCount > 0
+      ? `Cliente eliminado correctamente. ${salesCount} venta(s) fueron desvinculadas.`
+      : "Cliente eliminado correctamente";
+
+    res.json({ message, affected_sales: salesCount });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error eliminando cliente" });
