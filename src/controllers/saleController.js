@@ -175,6 +175,7 @@ const getSales = async (req, res) => {
         s.itbis_total,
         s.ncf,
         s.ncf_type,
+        s.canceled,
         s.created_at,
         s.payment_method,
         u.name AS user_name,
@@ -266,8 +267,99 @@ const getSaleById = async (req, res) => {
   }
 };
 
+const cancelSale = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+
+  try {
+    const saleCheck = await client.query(
+      "SELECT * FROM sales WHERE id = $1",
+      [id]
+    );
+
+    if (saleCheck.rows.length === 0) {
+      return res.status(404).json({ message: "Venta no encontrada" });
+    }
+
+    const sale = saleCheck.rows[0];
+
+    if (sale.canceled) {
+      return res.status(400).json({ message: "Esta venta ya está anulada" });
+    }
+
+    await client.query("BEGIN");
+
+    // Restaurar stock de cada producto
+    const items = await client.query(
+      "SELECT product_id, quantity FROM sale_items WHERE sale_id = $1",
+      [id]
+    );
+
+    for (const item of items.rows) {
+      await client.query(
+        "UPDATE products SET stock = stock + $1 WHERE id = $2",
+        [item.quantity, item.product_id]
+      );
+    }
+
+    await client.query(
+      "UPDATE sales SET canceled = true WHERE id = $1",
+      [id]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({ message: "Venta anulada correctamente. Stock restaurado." });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    res.status(500).json({ message: "Error anulando venta" });
+  } finally {
+    client.release();
+  }
+};
+
+const updateSale = async (req, res) => {
+  const { id } = req.params;
+  const { client_id, payment_method } = req.body;
+
+  try {
+    const saleCheck = await pool.query(
+      "SELECT * FROM sales WHERE id = $1",
+      [id]
+    );
+
+    if (saleCheck.rows.length === 0) {
+      return res.status(404).json({ message: "Venta no encontrada" });
+    }
+
+    if (saleCheck.rows[0].canceled) {
+      return res.status(400).json({ message: "No se puede editar una venta anulada" });
+    }
+
+    const result = await pool.query(
+      `UPDATE sales
+       SET client_id = COALESCE($1, client_id),
+           payment_method = COALESCE($2, payment_method)
+       WHERE id = $3
+       RETURNING *`,
+      [client_id || null, payment_method || null, id]
+    );
+
+    res.json({
+      message: "Venta actualizada correctamente",
+      sale: result.rows[0],
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error actualizando venta" });
+  }
+};
+
 module.exports = {
   createSale,
   getSales,
   getSaleById,
+  cancelSale,
+  updateSale,
 };

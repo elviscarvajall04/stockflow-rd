@@ -7,15 +7,15 @@ const getDashboardReport = async (req, res) => {
     );
 
     const totalSalesResult = await pool.query(
-      "SELECT COUNT(*) FROM sales"
+      "SELECT COUNT(*) FROM sales WHERE canceled = false"
     );
 
     const totalRevenueResult = await pool.query(
-      "SELECT COALESCE(SUM(total), 0) AS total_revenue FROM sales"
+      "SELECT COALESCE(SUM(total), 0) AS total_revenue FROM sales WHERE canceled = false"
     );
 
     const itbisCollectedResult = await pool.query(
-      "SELECT COALESCE(SUM(itbis_total), 0) AS total_itbis FROM sales"
+      "SELECT COALESCE(SUM(itbis_total), 0) AS total_itbis FROM sales WHERE canceled = false"
     );
 
     const lowStockResult = await pool.query(
@@ -29,10 +29,12 @@ const getDashboardReport = async (req, res) => {
         s.subtotal,
         s.itbis_total,
         s.ncf,
+        s.canceled,
         s.created_at,
         u.name AS user_name
       FROM sales s
       JOIN users u ON s.user_id = u.id
+      WHERE s.canceled = false
       ORDER BY s.created_at DESC
       LIMIT 5
     `);
