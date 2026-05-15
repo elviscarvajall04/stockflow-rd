@@ -55,3 +55,35 @@ ALTER TABLE sales ADD COLUMN IF NOT EXISTS itbis_total DECIMAL(10,2) DEFAULT 0;
 ALTER TABLE sales ADD COLUMN IF NOT EXISTS ncf VARCHAR(20) DEFAULT '';
 ALTER TABLE sales ADD COLUMN IF NOT EXISTS ncf_type VARCHAR(10) DEFAULT 'B02';
 ALTER TABLE sales ADD COLUMN IF NOT EXISTS canceled BOOLEAN DEFAULT false;
+
+-- ============================================
+-- StockFlow RD — Migración: Compras + Proveedores
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS suppliers (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  rnc VARCHAR(20) DEFAULT '',
+  phone VARCHAR(20) DEFAULT '',
+  email VARCHAR(100) DEFAULT '',
+  address TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS purchases (
+  id SERIAL PRIMARY KEY,
+  supplier_id INTEGER REFERENCES suppliers(id),
+  user_id INTEGER REFERENCES users(id),
+  total DECIMAL(10,2) NOT NULL DEFAULT 0,
+  ncf VARCHAR(20) DEFAULT '',
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS purchase_items (
+  id SERIAL PRIMARY KEY,
+  purchase_id INTEGER REFERENCES purchases(id) ON DELETE CASCADE,
+  product_id INTEGER REFERENCES products(id),
+  quantity INTEGER NOT NULL,
+  cost_price DECIMAL(10,2) NOT NULL
+);
