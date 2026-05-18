@@ -103,7 +103,7 @@ app.use("/api/inventory", inventoryRoutes);
 
 if (isProduction && require("fs").existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
-  app.get("*", (req, res, next) => {
+  app.get("/{*path}", (req, res, next) => {
     if (req.path.startsWith("/api")) return next();
     if (req.path.startsWith("/api/health")) return next();
     if (req.path.startsWith("/uploads")) return next();
