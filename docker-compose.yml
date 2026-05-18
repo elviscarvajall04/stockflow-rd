@@ -13,12 +13,18 @@ services:
       POSTGRES_DB: ${DB_NAME:-stockflow}
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-stockflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: .
     restart: unless-stopped
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DB_HOST: db
       DB_USER: ${DB_USER:-stockflow}
@@ -28,16 +34,25 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       NODE_ENV: production
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      PORT: "3000"
+      SSL_KEY: ${SSL_KEY:-}
+      SSL_CERT: ${SSL_CERT:-}
     volumes:
       - uploads:/app/src/uploads
     ports:
       - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build: ./stockflow-frontend
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     ports:
       - "80:80"
 

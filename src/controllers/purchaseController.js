@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 const { recordMovement } = require("./inventoryController");
+const { paginate, paginatedResponse } = require("../config/paginate");
 const logger = require("../config/logger");
 
 const createPurchase = async (req, res) => {
@@ -102,6 +103,8 @@ const createPurchase = async (req, res) => {
 
 const getPurchases = async (req, res) => {
   try {
+    const { page, limit, offset, hasPage } = paginate(req);
+    const countResult = await pool.query("SELECT COUNT(*) FROM purchases");
     const result = await pool.query(`
       SELECT
         pu.id AS purchase_id,
@@ -130,8 +133,9 @@ const getPurchases = async (req, res) => {
       LEFT JOIN products p ON pi.product_id = p.id
       GROUP BY pu.id, s.name, u.name
       ORDER BY pu.id DESC
-    `);
-    res.json(result.rows);
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+    res.json(paginatedResponse(result.rows, countResult.rows[0].count, page, limit, hasPage));
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Error obteniendo compras" });

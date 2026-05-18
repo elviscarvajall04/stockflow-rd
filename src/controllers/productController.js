@@ -1,16 +1,21 @@
 const pool = require("../config/db");
 const logger = require("../config/logger");
+const { paginate, paginatedResponse } = require("../config/paginate");
 
 const getProducts = async (req, res) => {
   try {
+    const { page, limit, offset, hasPage } = paginate(req);
+    const countResult = await pool.query("SELECT COUNT(*) FROM products WHERE active = true");
     const result = await pool.query(
       `SELECT p.*, c.name AS category_name
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
        WHERE p.active = true
-       ORDER BY p.id ASC`
+       ORDER BY p.id ASC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
     );
-    res.json(result.rows);
+    res.json(paginatedResponse(result.rows, countResult.rows[0].count, page, limit, hasPage));
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Error obteniendo productos" });

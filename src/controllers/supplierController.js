@@ -1,8 +1,11 @@
 const pool = require("../config/db");
 const logger = require("../config/logger");
+const { paginate, paginatedResponse } = require("../config/paginate");
 
 const getSuppliers = async (req, res) => {
   try {
+    const { page, limit, offset, hasPage } = paginate(req);
+    const countResult = await pool.query("SELECT COUNT(*) FROM suppliers");
     const result = await pool.query(`
       SELECT s.*,
         COALESCE(p.purchase_count, 0) AS purchase_count
@@ -12,8 +15,9 @@ const getSuppliers = async (req, res) => {
         FROM purchases GROUP BY supplier_id
       ) p ON p.supplier_id = s.id
       ORDER BY s.name ASC
-    `);
-    res.json(result.rows);
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+    res.json(paginatedResponse(result.rows, countResult.rows[0].count, page, limit, hasPage));
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Error obteniendo proveedores" });

@@ -2,6 +2,7 @@ const pool = require("../config/db");
 const { generateNCF } = require("../services/ncfService");
 const { recordMovement } = require("./inventoryController");
 const logger = require("../config/logger");
+const { paginate, paginatedResponse } = require("../config/paginate");
 
 const createSale = async (req, res) => {
   const client = await pool.connect();
@@ -185,6 +186,8 @@ const createSale = async (req, res) => {
 
 const getSales = async (req, res) => {
   try {
+    const { page, limit, offset, hasPage } = paginate(req);
+    const countResult = await pool.query("SELECT COUNT(*) FROM sales");
     const result = await pool.query(`
       SELECT
         s.id AS sale_id,
@@ -216,8 +219,9 @@ const getSales = async (req, res) => {
       LEFT JOIN products p ON si.product_id = p.id
       GROUP BY s.id, u.name, c.name
       ORDER BY s.id DESC
-    `);
-    res.json(result.rows);
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+    res.json(paginatedResponse(result.rows, countResult.rows[0].count, page, limit, hasPage));
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Error obteniendo ventas" });

@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  backend:
+    volumes:
+      - ${SSL_DIR:-./certs}:/etc/ssl/stockflow:ro
+    environment:
+      SSL_KEY: /etc/ssl/stockflow/privkey.pem
+      SSL_CERT: /etc/ssl/stockflow/fullchain.pem
+    ports:
+      - "443:443"
+
+  frontend:
+    volumes:
+      - ${SSL_DIR:-./certs}:/etc/ssl/certs:ro
+      - ${SSL_DIR:-./certs}:/etc/ssl/private:ro

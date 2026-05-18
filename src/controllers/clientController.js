@@ -1,8 +1,11 @@
 const pool = require("../config/db");
 const logger = require("../config/logger");
-// Obtener todos los clientes
+const { paginate, paginatedResponse } = require("../config/paginate");
+
 const getClients = async (req, res) => {
   try {
+    const { page, limit, offset, hasPage } = paginate(req);
+    const countResult = await pool.query("SELECT COUNT(*) FROM clients");
     const result = await pool.query(`
       SELECT c.*,
         COALESCE(s.sales_count, 0) AS sales_count
@@ -14,8 +17,9 @@ const getClients = async (req, res) => {
         GROUP BY client_id
       ) s ON s.client_id = c.id
       ORDER BY c.created_at DESC
-    `);
-    res.json(result.rows);
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+    res.json(paginatedResponse(result.rows, countResult.rows[0].count, page, limit, hasPage));
   } catch (error) {
     logger.error(error);
     res.status(500).json({ message: "Error obteniendo clientes" });
