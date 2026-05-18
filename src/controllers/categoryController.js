@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../config/logger");
 
 const getCategories = async (req, res) => {
   try {
@@ -11,7 +12,7 @@ const getCategories = async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo categorías" });
   }
 };
@@ -31,7 +32,7 @@ const createCategory = async (req, res) => {
     if (error.code === "23505") {
       return res.status(400).json({ message: "Ya existe una categoría con ese nombre" });
     }
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error creando categoría" });
   }
 };
@@ -55,7 +56,7 @@ const updateCategory = async (req, res) => {
     if (error.code === "23505") {
       return res.status(400).json({ message: "Ya existe una categoría con ese nombre" });
     }
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error actualizando categoría" });
   }
 };
@@ -75,7 +76,7 @@ const deleteCategory = async (req, res) => {
     }
     res.json({ message: "Categoría eliminada" });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando categoría" });
   }
 };

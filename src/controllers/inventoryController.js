@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../config/logger");
 
 async function recordMovement(client, productId, type, quantity, referenceType, referenceId, unitCost = 0, notes = "") {
   const stockResult = await client.query(
@@ -53,7 +54,7 @@ const getMovements = async (req, res) => {
     const result = await pool.query(sql, params);
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo movimientos" });
   }
 };
@@ -88,7 +89,7 @@ const getInventoryValue = async (req, res) => {
       low_stock: Number(lowStock.rows[0].count),
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo valor del inventario" });
   }
 };

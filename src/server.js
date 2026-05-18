@@ -4,6 +4,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
 require("dotenv").config();
+const logger = require("./config/logger");
 
 const productRoutes = require("./routes/productRoutes");
 const saleRoutes = require("./routes/saleRoutes");
@@ -46,6 +47,25 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/health", async (req, res) => {
+  try {
+    const { Pool } = require("pg");
+    const pool = new Pool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      port: process.env.DB_PORT || 5432,
+      connectionTimeoutMillis: 3000,
+    });
+    await pool.query("SELECT 1");
+    await pool.end();
+    res.json({ status: "ok", db: "connected", timestamp: new Date().toISOString() });
+  } catch {
+    res.status(503).json({ status: "error", db: "disconnected", timestamp: new Date().toISOString() });
+  }
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/sales", saleRoutes);
@@ -62,5 +82,5 @@ app.use("/api/inventory", inventoryRoutes);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  logger.info(`Servidor iniciado en puerto ${PORT}, entorno: ${process.env.NODE_ENV || "development"}`);
 });

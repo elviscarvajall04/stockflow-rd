@@ -21,7 +21,8 @@
     "jspdf-autotable": "^5.0.7",
     "multer": "^2.1.1",
     "pg": "^8.20.0",
-    "react-router-dom": "^7.14.2"
+    "react-router-dom": "^7.14.2",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

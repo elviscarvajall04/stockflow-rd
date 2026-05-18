@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../config/logger");
 
 const getCompanySettings = async (req, res) => {
   try {
@@ -20,7 +21,7 @@ const getCompanySettings = async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo configuración" });
   }
 };
@@ -96,7 +97,7 @@ const updateCompanySettings = async (req, res) => {
       settings: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error actualizando configuración" });
   }
 };

@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../config/logger");
 
 const getProducts = async (req, res) => {
   try {
@@ -11,7 +12,7 @@ const getProducts = async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo productos" });
   }
 };
@@ -27,7 +28,7 @@ const getLowStockProducts = async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo productos con bajo stock" });
   }
 };
@@ -47,7 +48,7 @@ const getProductById = async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo producto" });
   }
 };
@@ -71,7 +72,7 @@ const createProduct = async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error creando producto" });
   }
 };
@@ -99,7 +100,7 @@ const updateProduct = async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error actualizando producto" });
   }
 };
@@ -144,7 +145,7 @@ const deleteProduct = async (req, res) => {
       product: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando producto" });
   }
 };

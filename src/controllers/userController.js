@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
+const logger = require("../config/logger");
 
 const getUsers = async (req, res) => {
   try {
@@ -8,7 +9,7 @@ const getUsers = async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo usuarios" });
   }
 };
@@ -25,7 +26,7 @@ const getUserById = async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo usuario" });
   }
 };
@@ -49,7 +50,7 @@ const updateUser = async (req, res) => {
     }
     res.json({ message: "Usuario actualizado", user: result.rows[0] });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     if (error.code === "23505") {
       return res.status(400).json({ message: "El correo ya está registrado" });
     }
@@ -74,7 +75,7 @@ const deleteUser = async (req, res) => {
     }
     res.json({ message: "Usuario eliminado correctamente" });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando usuario" });
   }
 };

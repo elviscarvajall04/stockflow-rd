@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../config/logger");
 
 const getDashboardReport = async (req, res) => {
   try {
@@ -60,7 +61,7 @@ const getDashboardReport = async (req, res) => {
       recent_sales: recentSalesResult.rows,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo reporte del dashboard" });
   }
 };
@@ -136,7 +137,7 @@ const getDgiiReport = async (req, res) => {
       ncf_secuencias: ncfSequences.rows,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error generando reporte DGII" });
   }
 };
@@ -248,7 +249,7 @@ const getProfitReport = async (req, res) => {
       daily,
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error generando reporte de ganancias" });
   }
 };

@@ -1,6 +1,7 @@
 const pool = require("../config/db");
 const path = require("path");
 const fs = require("fs");
+const logger = require("../config/logger");
 
 const uploadLogo = async (req, res) => {
   try {
@@ -35,7 +36,7 @@ const uploadLogo = async (req, res) => {
 
     res.json({ logo_url: logoUrl });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error subiendo logo" });
   }
 };
@@ -55,7 +56,7 @@ const deleteLogo = async (req, res) => {
     }
     res.json({ message: "Logo eliminado" });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando logo" });
   }
 };

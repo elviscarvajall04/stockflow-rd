@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../config/logger");
 
 const getSuppliers = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const getSuppliers = async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo proveedores" });
   }
 };
@@ -41,7 +42,7 @@ const getSupplierById = async (req, res) => {
       total_purchases: purchases.rows.reduce((sum, p) => sum + Number(p.total), 0),
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo proveedor" });
   }
 };
@@ -58,7 +59,7 @@ const createSupplier = async (req, res) => {
     );
     res.status(201).json({ message: "Proveedor creado correctamente", supplier: result.rows[0] });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error creando proveedor" });
   }
 };
@@ -76,7 +77,7 @@ const updateSupplier = async (req, res) => {
     }
     res.json({ message: "Proveedor actualizado", supplier: result.rows[0] });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error actualizando proveedor" });
   }
 };
@@ -93,7 +94,7 @@ const deleteSupplier = async (req, res) => {
     await pool.query("DELETE FROM suppliers WHERE id = $1", [id]);
     res.json({ message: "Proveedor eliminado correctamente" });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando proveedor" });
   }
 };

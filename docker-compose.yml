@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/migration.sql:/docker-entrypoint-initdb.d/migration.sql
+    environment:
+      POSTGRES_USER: ${DB_USER:-stockflow}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-stockflow123}
+      POSTGRES_DB: ${DB_NAME:-stockflow}
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: ${DB_USER:-stockflow}
+      DB_PASSWORD: ${DB_PASSWORD:-stockflow123}
+      DB_NAME: ${DB_NAME:-stockflow}
+      DB_PORT: "5432"
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: production
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+    volumes:
+      - uploads:/app/src/uploads
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./stockflow-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  pgdata:
+  uploads:

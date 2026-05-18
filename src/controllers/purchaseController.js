@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 const { recordMovement } = require("./inventoryController");
+const logger = require("../config/logger");
 
 const createPurchase = async (req, res) => {
   const client = await pool.connect();
@@ -92,7 +93,7 @@ const createPurchase = async (req, res) => {
     });
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error registrando compra" });
   } finally {
     client.release();
@@ -132,7 +133,7 @@ const getPurchases = async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo compras" });
   }
 };
@@ -177,7 +178,7 @@ const getPurchaseById = async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo compra" });
   }
 };
@@ -213,7 +214,7 @@ const deletePurchase = async (req, res) => {
     res.json({ message: "Compra eliminada y stock revertido" });
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando compra" });
   } finally {
     client.release();
@@ -238,7 +239,7 @@ const updatePurchase = async (req, res) => {
     }
     res.json({ message: "Compra actualizada", purchase: result.rows[0] });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error actualizando compra" });
   }
 };

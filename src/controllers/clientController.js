@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const logger = require("../config/logger");
 // Obtener todos los clientes
 const getClients = async (req, res) => {
   try {
@@ -16,7 +17,7 @@ const getClients = async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo clientes" });
   }
 };
@@ -55,7 +56,7 @@ const getClientById = async (req, res) => {
       ),
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo cliente" });
   }
 };
@@ -76,7 +77,7 @@ const createClient = async (req, res) => {
       client: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error creando cliente" });
   }
 };
@@ -126,7 +127,7 @@ const deleteClient = async (req, res) => {
 
     res.json({ message, affected_sales: salesCount });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando cliente" });
   }
 };

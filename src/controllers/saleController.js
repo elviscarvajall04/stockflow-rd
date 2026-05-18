@@ -1,6 +1,7 @@
 const pool = require("../config/db");
 const { generateNCF } = require("../services/ncfService");
 const { recordMovement } = require("./inventoryController");
+const logger = require("../config/logger");
 
 const createSale = async (req, res) => {
   const client = await pool.connect();
@@ -172,7 +173,7 @@ const createSale = async (req, res) => {
 
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error(error);
+    logger.error(error);
     const message = error.message && (error.message.includes("NCF") || error.message.includes("secuencia"))
       ? error.message
       : "Error registrando venta";
@@ -218,7 +219,7 @@ const getSales = async (req, res) => {
     `);
     res.json(result.rows);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo ventas" });
   }
 };
@@ -279,7 +280,7 @@ const getSaleById = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error obteniendo venta" });
   }
 };
@@ -365,7 +366,7 @@ const cancelSale = async (req, res) => {
     });
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error anulando venta" });
   } finally {
     client.release();
@@ -404,7 +405,7 @@ const updateSale = async (req, res) => {
       sale: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error actualizando venta" });
   }
 };
@@ -441,7 +442,7 @@ const deleteSale = async (req, res) => {
     res.json({ message: "Venta eliminada permanentemente" });
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error eliminando venta" });
   } finally {
     client.release();

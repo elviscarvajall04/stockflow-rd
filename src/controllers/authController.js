@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
+const logger = require("../config/logger");
 
 // REGISTRO
 const register = async (req, res) => {
@@ -48,7 +49,7 @@ const register = async (req, res) => {
       user: result.rows[0],
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error registrando usuario" });
   }
 };
@@ -113,7 +114,7 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     res.status(500).json({ message: "Error iniciando sesión" });
   }
 };
