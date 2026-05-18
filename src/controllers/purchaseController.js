@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { recordMovement } = require("./inventoryController");
 
 const createPurchase = async (req, res) => {
   const client = await pool.connect();
@@ -18,27 +19,44 @@ const createPurchase = async (req, res) => {
     const purchaseItems = [];
 
     for (const item of items) {
-      const { product_id, quantity, cost_price } = item;
+      let { product_id, new_product_name, new_sale_price, quantity, cost_price, applies_itbis } = item;
 
-      if (!product_id || !quantity || quantity <= 0 || !cost_price || cost_price <= 0) {
+      if (!quantity || quantity <= 0 || !cost_price || cost_price <= 0) {
         await client.query("ROLLBACK");
         return res.status(400).json({
-          message: "Cada producto debe tener product_id, quantity y cost_price mayor a 0",
+          message: "Cada producto debe tener quantity y cost_price mayor a 0",
         });
       }
 
-      const productCheck = await client.query(
-        "SELECT id, name FROM products WHERE id = $1", [product_id]
-      );
-      if (productCheck.rows.length === 0) {
-        await client.query("ROLLBACK");
-        return res.status(404).json({ message: `Producto id ${product_id} no encontrado` });
+      // Crear producto nuevo sobre la marcha
+      if (!product_id) {
+        if (!new_product_name || !new_sale_price) {
+          await client.query("ROLLBACK");
+          return res.status(400).json({
+            message: "Para crear un producto nuevo necesitas nombre y precio de venta",
+          });
+        }
+        const itbisRate = applies_itbis !== false ? 18.00 : 0;
+        const newProduct = await client.query(
+          `INSERT INTO products (name, price, stock, itbis, active)
+           VALUES ($1, $2, 0, $3, true) RETURNING id`,
+          [new_product_name, Number(new_sale_price), itbisRate]
+        );
+        product_id = newProduct.rows[0].id;
+      } else {
+        const productCheck = await client.query(
+          "SELECT id, name FROM products WHERE id = $1", [product_id]
+        );
+        if (productCheck.rows.length === 0) {
+          await client.query("ROLLBACK");
+          return res.status(404).json({ message: `Producto id ${product_id} no encontrado` });
+        }
       }
 
       const itemTotal = Number(cost_price) * Number(quantity);
       total += itemTotal;
 
-      purchaseItems.push({ product_id, quantity, cost_price: Number(cost_price) });
+      purchaseItems.push({ product_id, quantity, cost_price: Number(cost_price), applies_itbis: applies_itbis !== false });
 
       // Incrementar stock
       await client.query(
@@ -57,10 +75,11 @@ const createPurchase = async (req, res) => {
 
     for (const item of purchaseItems) {
       await client.query(
-        `INSERT INTO purchase_items (purchase_id, product_id, quantity, cost_price)
-         VALUES ($1, $2, $3, $4)`,
-        [purchase.id, item.product_id, item.quantity, item.cost_price]
+        `INSERT INTO purchase_items (purchase_id, product_id, quantity, cost_price, applies_itbis)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [purchase.id, item.product_id, item.quantity, item.cost_price, item.applies_itbis]
       );
+      await recordMovement(client, item.product_id, "entry", item.quantity, "purchase", purchase.id, item.cost_price);
     }
 
     await client.query("COMMIT");
@@ -96,7 +115,8 @@ const getPurchases = async (req, res) => {
               'product_id', p.id,
               'product_name', p.name,
               'quantity', pi.quantity,
-              'cost_price', pi.cost_price
+              'cost_price', pi.cost_price,
+              'applies_itbis', pi.applies_itbis
             )
           ) FILTER (WHERE pi.id IS NOT NULL),
           '[]'
@@ -136,7 +156,8 @@ const getPurchaseById = async (req, res) => {
               'product_name', p.name,
               'quantity', pi.quantity,
               'cost_price', pi.cost_price,
-              'subtotal', pi.quantity * pi.cost_price
+              'subtotal', pi.quantity * pi.cost_price,
+              'applies_itbis', pi.applies_itbis
             )
           ) FILTER (WHERE pi.id IS NOT NULL),
           '[]'
@@ -160,4 +181,65 @@ const getPurchaseById = async (req, res) => {
   }
 };
 
-module.exports = { createPurchase, getPurchases, getPurchaseById };
+const deletePurchase = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+  try {
+    const check = await client.query("SELECT * FROM purchases WHERE id = $1", [id]);
+    if (check.rows.length === 0) {
+      return res.status(404).json({ message: "Compra no encontrada" });
+    }
+
+    await client.query("BEGIN");
+
+    // Devolver stock (decrementar)
+    const items = await client.query(
+      "SELECT product_id, quantity FROM purchase_items WHERE purchase_id = $1",
+      [id]
+    );
+    for (const item of items.rows) {
+      await client.query(
+        "UPDATE products SET stock = stock - $1 WHERE id = $2",
+        [item.quantity, item.product_id]
+      );
+      await recordMovement(client, item.product_id, "exit", item.quantity, "purchase_delete", Number(id), 0, "Eliminación de compra");
+    }
+
+    await client.query("DELETE FROM purchase_items WHERE purchase_id = $1", [id]);
+    await client.query("DELETE FROM purchases WHERE id = $1", [id]);
+
+    await client.query("COMMIT");
+    res.json({ message: "Compra eliminada y stock revertido" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    res.status(500).json({ message: "Error eliminando compra" });
+  } finally {
+    client.release();
+  }
+};
+
+const updatePurchase = async (req, res) => {
+  const { id } = req.params;
+  const { supplier_id, ncf, notes } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE purchases
+       SET supplier_id = COALESCE($1, supplier_id),
+           ncf = COALESCE($2, ncf),
+           notes = COALESCE($3, notes)
+       WHERE id = $4
+       RETURNING *`,
+      [supplier_id || null, ncf, notes, id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Compra no encontrada" });
+    }
+    res.json({ message: "Compra actualizada", purchase: result.rows[0] });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error actualizando compra" });
+  }
+};
+
+module.exports = { createPurchase, getPurchases, getPurchaseById, updatePurchase, deletePurchase };

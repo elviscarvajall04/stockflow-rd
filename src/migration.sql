@@ -87,3 +87,33 @@ CREATE TABLE IF NOT EXISTS purchase_items (
   quantity INTEGER NOT NULL,
   cost_price DECIMAL(10,2) NOT NULL
 );
+
+-- Categories
+CREATE TABLE IF NOT EXISTS categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE products ADD COLUMN IF NOT EXISTS category_id INTEGER REFERENCES categories(id);
+
+ALTER TABLE clients ADD COLUMN IF NOT EXISTS client_type VARCHAR(10) DEFAULT 'final';
+
+-- Inventory movements (Kardex)
+CREATE TABLE IF NOT EXISTS inventory_movements (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER NOT NULL REFERENCES products(id),
+  type VARCHAR(10) NOT NULL CHECK (type IN ('entry', 'exit', 'adjustment')),
+  quantity INTEGER NOT NULL,
+  balance_after INTEGER NOT NULL,
+  unit_cost DECIMAL(10,2) DEFAULT 0,
+  reference_type VARCHAR(20) NOT NULL,
+  reference_id INTEGER,
+  notes TEXT DEFAULT '',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_inventory_movements_product ON inventory_movements(product_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_movements_date ON inventory_movements(created_at);
+
+ALTER TABLE purchase_items ADD COLUMN IF NOT EXISTS applies_itbis BOOLEAN DEFAULT true;

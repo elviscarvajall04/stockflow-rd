@@ -70,14 +70,14 @@ const getClientById = async (req, res) => {
 
 // Crear cliente
 const createClient = async (req, res) => {
-  const { name, email, phone, address } = req.body;
+  const { name, email, phone, address, client_type } = req.body;
   if (!name) {
     return res.status(400).json({ message: "El nombre es obligatorio" });
   }
   try {
     const result = await pool.query(
-      "INSERT INTO clients (name, email, phone, address) VALUES ($1, $2, $3, $4) RETURNING *",
-      [name, email, phone, address]
+      "INSERT INTO clients (name, email, phone, address, client_type) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [name, email, phone, address, client_type || "final"]
     );
     res.status(201).json({
       message: "Cliente creado correctamente",
@@ -97,11 +97,11 @@ console.error("CREATE CLIENT ERROR:", error);
 // Actualizar cliente
 const updateClient = async (req, res) => {
   const { id } = req.params;
-  const { name, email, phone, address } = req.body;
+  const { name, email, phone, address, client_type } = req.body;
   try {
     const result = await pool.query(
-      "UPDATE clients SET name=$1, email=$2, phone=$3, address=$4 WHERE id=$5 RETURNING *",
-      [name, email, phone, address, id]
+      "UPDATE clients SET name=$1, email=$2, phone=$3, address=$4, client_type=$5 WHERE id=$6 RETURNING *",
+      [name, email, phone, address, client_type || "final", id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Cliente no encontrado" });

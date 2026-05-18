@@ -1,5 +1,6 @@
 const pool = require("../config/db");
 const { generateNCF } = require("../services/ncfService");
+const { recordMovement } = require("./inventoryController");
 
 const createSale = async (req, res) => {
   const client = await pool.connect();
@@ -98,7 +99,18 @@ const createSale = async (req, res) => {
       "SELECT rnc, company_name FROM company_settings LIMIT 1"
     );
     const companyRow = company.rows[0] || { rnc: "", company_name: "" };
-    const ncfType = "B02";
+
+    // Determinar tipo NCF según el tipo de cliente
+    let ncfType = "B02";
+    if (client_id) {
+      const clientResult = await client.query(
+        "SELECT client_type FROM clients WHERE id = $1",
+        [client_id]
+      );
+      if (clientResult.rows.length > 0 && clientResult.rows[0].client_type === "fiscal") {
+        ncfType = "B01";
+      }
+    }
     const ncf = await generateNCF(client, ncfType);
 
     const saleResult = await client.query(
@@ -133,6 +145,7 @@ const createSale = async (req, res) => {
         `,
         [sale.id, item.product_id, item.quantity, item.price]
       );
+      await recordMovement(client, item.product_id, "exit", item.quantity, "sale", sale.id, item.price);
     }
 
     await client.query("COMMIT");
@@ -159,7 +172,10 @@ const createSale = async (req, res) => {
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
-    res.status(500).json({ message: "Error registrando venta" });
+    const message = error.message && (error.message.includes("NCF") || error.message.includes("secuencia"))
+      ? error.message
+      : "Error registrando venta";
+    res.status(500).json({ message });
   } finally {
     client.release();
   }
@@ -300,6 +316,7 @@ const cancelSale = async (req, res) => {
         "UPDATE products SET stock = stock + $1 WHERE id = $2",
         [item.quantity, item.product_id]
       );
+      await recordMovement(client, item.product_id, "entry", item.quantity, "cancellation", Number(id), 0, "Anulación de venta");
     }
 
     await client.query(
@@ -309,7 +326,42 @@ const cancelSale = async (req, res) => {
 
     await client.query("COMMIT");
 
-    res.json({ message: "Venta anulada correctamente. Stock restaurado." });
+    // Return full sale data for credit note
+    const saleData = await pool.query(`
+      SELECT
+        s.id AS sale_id, s.total, s.subtotal, s.itbis_total, s.ncf, s.ncf_type,
+        s.payment_method, s.created_at, s.canceled,
+        u.name AS user_name, c.name AS client_name,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'product_id', p.id,
+              'product_name', p.name,
+              'quantity', si.quantity,
+              'price', si.price,
+              'itbis_rate', p.itbis
+            )
+          ) FILTER (WHERE si.id IS NOT NULL),
+          '[]'
+        ) AS items
+      FROM sales s
+      JOIN users u ON s.user_id = u.id
+      LEFT JOIN clients c ON s.client_id = c.id
+      LEFT JOIN sale_items si ON s.id = si.sale_id
+      LEFT JOIN products p ON si.product_id = p.id
+      WHERE s.id = $1
+      GROUP BY s.id, u.name, c.name
+    `, [id]);
+
+    const company = await pool.query(
+      "SELECT * FROM company_settings LIMIT 1"
+    );
+
+    res.json({
+      message: "Venta anulada correctamente. Stock restaurado.",
+      sale: saleData.rows[0],
+      company: company.rows[0] || null,
+    });
   } catch (error) {
     await client.query("ROLLBACK");
     console.error(error);
@@ -356,10 +408,50 @@ const updateSale = async (req, res) => {
   }
 };
 
+const deleteSale = async (req, res) => {
+  const { id } = req.params;
+  const client = await pool.connect();
+
+  try {
+    const saleCheck = await client.query(
+      "SELECT * FROM sales WHERE id = $1",
+      [id]
+    );
+
+    if (saleCheck.rows.length === 0) {
+      return res.status(404).json({ message: "Venta no encontrada" });
+    }
+
+    if (!saleCheck.rows[0].canceled) {
+      return res.status(400).json({ message: "Solo se pueden eliminar ventas anuladas" });
+    }
+
+    await client.query("BEGIN");
+
+    await client.query(
+      "DELETE FROM inventory_movements WHERE reference_id = $1 AND reference_type IN ('sale', 'cancellation')",
+      [id]
+    );
+    await client.query("DELETE FROM sale_items WHERE sale_id = $1", [id]);
+    await client.query("DELETE FROM sales WHERE id = $1", [id]);
+
+    await client.query("COMMIT");
+
+    res.json({ message: "Venta eliminada permanentemente" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error(error);
+    res.status(500).json({ message: "Error eliminando venta" });
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   createSale,
   getSales,
   getSaleById,
   cancelSale,
   updateSale,
+  deleteSale,
 };
