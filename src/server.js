@@ -10,7 +10,7 @@ const logger = require("./config/logger");
 const runMigrations = require("./runMigrations");
 
 const isProduction = process.env.NODE_ENV === "production";
-const frontendDist = path.join(__dirname, "../stockflow-frontend/dist");
+const frontendDist = path.join(__dirname, "../frontend-dist");
 
 const productRoutes = require("./routes/productRoutes");
 const saleRoutes = require("./routes/saleRoutes");

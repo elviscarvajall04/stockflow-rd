@@ -1,20 +1,10 @@
-FROM node:20-alpine AS frontend-build
-RUN apk add --no-cache git
-WORKDIR /app
-RUN git clone --depth=1 https://github.com/elviscarvajall04/stockflow-frontend.git frontend
-WORKDIR /app/frontend
-ARG VITE_API_URL=/api
-ENV VITE_API_URL=$VITE_API_URL
-RUN npm ci && npm run build
-
 FROM node:20-alpine
 RUN apk add --no-cache curl
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 COPY . .
-COPY --from=frontend-build /app/frontend/dist /app/stockflow-frontend/dist
-RUN rm -rf stockflow-frontend/src stockflow-frontend/public stockflow-frontend/node_modules
+RUN rm -rf stockflow-frontend/src stockflow-frontend/public stockflow-frontend/node_modules stockflow-frontend/.git
 EXPOSE 3000
 ENV NODE_ENV=production
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
