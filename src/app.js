@@ -101,7 +101,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/inventory", inventoryRoutes);
 
-if (isProduction && !process.env.VERCEL && require("fs").existsSync(frontendDist)) {
+if (isProduction && require("fs").existsSync(frontendDist)) {
   app.use(express.static(frontendDist));
   app.get("*", (req, res, next) => {
     if (req.path.startsWith("/api")) return next();
