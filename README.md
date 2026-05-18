@@ -1,99 +1,152 @@
-📦 StockFlow RD API
+# StockFlow RD
 
-Backend de gestión de inventario y ventas desarrollado con Node.js, Express y PostgreSQL.
-Incluye autenticación con JWT, control de roles (admin / employee) y lógica real de negocio.
+Sistema de gestión de inventario y ventas para negocios en República Dominicana.
+Cumplimiento fiscal: NCF, ITBIS, reportes DGII.
 
-🚀 Características
-CRUD completo de productos
-Registro de ventas con descuento automático de stock
-Historial de ventas
-Reporte de dashboard (KPIs)
-Autenticación con JWT
-Protección de rutas
-Sistema de roles:
-Admin: gestiona productos
-Employee: registra ventas y consulta datos
-🛠️ Tecnologías
-Node.js
-Express
-PostgreSQL
-JWT (jsonwebtoken)
-bcrypt
-dotenv
-⚙️ Instalación
-Clonar repositorio:
-git clone https://github.com/TU-USUARIO/stockflow-rd.git
-cd stockflow-rd
-Instalar dependencias:
+## Stack
+
+- **Backend**: Node.js + Express + PostgreSQL
+- **Frontend**: React + Vite + Recharts
+- **Auth**: JWT (roles: admin / employee)
+
+## Requisitos
+
+- Node.js 20+
+- PostgreSQL 16+
+- Docker (opcional, para deploy)
+
+## Inicio rápido (desarrollo)
+
+```bash
+# Backend
+cp .env.example .env  # editar credenciales
 npm install
-Crear archivo .env en la raíz:
-DB_HOST=localhost
-DB_USER=elvis
-DB_PASSWORD=
-DB_NAME=stockflow
-DB_PORT=5432
+npm run dev            # http://localhost:3000
 
-JWT_SECRET=stockflow_super_secret_key_2026
-Ejecutar servidor:
-npm run dev
-🔐 Autenticación
-Registro
-POST /api/auth/register
-Login
-POST /api/auth/login
+# Frontend (otra terminal)
+cd stockflow-frontend
+cp .env.development .env
+npm install
+npm run dev            # http://localhost:5173
+```
 
-Devuelve un token JWT que debe enviarse en headers:
+## Inicio rápido (Docker)
 
-Authorization: Bearer TOKEN
-📦 Productos
-Método Endpoint
-GET /api/products
-GET /api/products/:id
-GET /api/products/low-stock
-POST /api/products
-PUT /api/products/:id
-DELETE /api/products/:id
+```bash
+docker compose up -d
+# Frontend: http://localhost
+# API: http://localhost:3000
+# Health: http://localhost:3000/health
+```
 
-🔒 Protegido por JWT
-👤 Solo admin puede crear, editar y eliminar
+### Con HTTPS
 
-💰 Ventas
-Método Endpoint
-POST /api/sales
-GET /api/sales
-GET /api/sales/:id
-Registra ventas con múltiples productos
-Calcula total automáticamente
-Descuenta stock en tiempo real
+```bash
+# Colocar certificados en ./certs/ (privkey.pem + fullchain.pem)
+export SSL_DIR=./certs
+docker compose -f docker-compose.yml -f docker-compose.https.yml up -d
+```
 
-🔒 Requiere autenticación
+## Backup
 
-📊 Reportes
-GET /api/reports/dashboard
+```bash
+./scripts/backup.sh
+# Programar con cron: 0 3 * * * /ruta/a/scripts/backup.sh
+```
 
-Incluye:
+## API endpoints
 
-Total de productos
-Total de ventas
-Ingresos
-Productos con bajo stock
-Ventas recientes
-🔐 Roles
-Rol Permisos
-admin CRUD productos + ventas
-employee ver productos + registrar ventas
-🧠 Lógica destacada
-Transacciones SQL (BEGIN / COMMIT / ROLLBACK)
-Validación de stock antes de venta
-Encriptación de contraseñas
-Middleware de autenticación y autorización
-👨‍💻 Autor
+### Auth
+| Método | Ruta | Acceso |
+|--------|------|--------|
+| POST | `/api/auth/register` | Público |
+| POST | `/api/auth/login` | Público (rate limit: 10/15min) |
 
-Elvis Carvajal
-Software Engineering Student
-República Dominicana
+### Productos
+| Método | Ruta | Acceso |
+|--------|------|--------|
+| GET | `/api/products?page=1&limit=50` | Autenticado |
+| GET | `/api/products/low-stock` | Autenticado |
+| GET | `/api/products/:id` | Autenticado |
+| POST | `/api/products` | Admin |
+| PUT | `/api/products/:id` | Admin |
+| DELETE | `/api/products/:id` | Admin |
 
-🔥 Nota final
+### Ventas
+| Método | Ruta | Acceso |
+|--------|------|--------|
+| GET | `/api/sales?page=1&limit=50` | Autenticado |
+| GET | `/api/sales/:id` | Autenticado |
+| POST | `/api/sales` | Autenticado |
+| PUT | `/api/sales/:id` | Autenticado |
+| PUT | `/api/sales/:id/cancel` | Autenticado |
+| DELETE | `/api/sales/:id` | Admin |
 
-Este proyecto simula un sistema real de inventario con buenas prácticas de backend, seguridad y manejo de datos.
-# stockflow-rd
+### Compras, Proveedores, Clientes, Categorías
+Todas siguen el mismo patrón CRUD con paginación opcional (`?page=1&limit=50`).
+
+### Reportes
+| Ruta | Descripción |
+|------|-------------|
+| `/api/reports/dashboard` | KPIs generales |
+| `/api/reports/dgii?month=&year=` | Declaración ITBIS mensual |
+| `/api/reports/profit?from=&to=` | Ganancias por período |
+
+### Health
+| Ruta | Descripción |
+|------|-------------|
+| `/health` | Estado del servidor y BD |
+
+## Roles
+
+- **admin**: CRUD completo, configuración, usuarios, reportes DGII
+- **employee**: Ventas, consultas, dashboard
+
+## Funcionalidades
+
+- Control de inventario (kardex / movimientos)
+- Facturación fiscal dominicana (NCF + ITBIS)
+- Reporte DGII mensual exportable a PDF
+- Dashboard con gráficas (ingresos, productos más vendidos)
+- Módulo de ganancias con margen por producto
+- Roles y permisos (admin / employee)
+- Búsqueda en listados
+- Paginación opcional en API
+- Docker + docker-compose listo para producción
+- Health check endpoint
+- Logs estructurados (winston)
+- Rate limiting en auth
+- Helmet (seguridad HTTP)
+- CORS configurable
+- Script de backup automático
+- CI/CD (GitHub Actions)
+- HTTPS vía nginx + certs
+
+## Estructura
+
+```
+stockflow-rd/
+├── src/
+│   ├── config/        # DB, logger, paginación
+│   ├── controllers/   # Lógica de negocio
+│   ├── middlewares/    # Auth, roles, uploads
+│   ├── routes/        # Definición de rutas
+│   ├── services/      # NCF, utilidades
+│   └── migration.sql  # Esquema BD
+├── scripts/           # Backup
+├── docker-compose.yml
+├── Dockerfile
+├── ecosystem.config.js
+└── stockflow-frontend/
+    ├── src/
+    │   ├── pages/     # 12 páginas
+    │   ├── components/ # Navbar, etc.
+    │   ├── hooks/     # usePDF
+    │   └── services/  # API client
+    ├── Dockerfile
+    └── nginx.conf
+```
+
+## Autor
+
+Elvis Carvajal — República Dominicana
