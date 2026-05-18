@@ -2,10 +2,9 @@
   "name": "stockflow-rd",
   "version": "1.0.0",
   "description": "Sistema de gestión de inventario y ventas",
-  "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "start": "node src/server.js",
+    "start:local": "node src/server.js",
     "migrate": "node src/runMigrations.js",
     "vercel-build": "mkdir -p public && cp -r frontend-dist/* public/"
   },
