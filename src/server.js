@@ -2,9 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const https = require("https");
+const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 const logger = require("./config/logger");
+const runMigrations = require("./runMigrations");
 
 const productRoutes = require("./routes/productRoutes");
 const saleRoutes = require("./routes/saleRoutes");
@@ -37,8 +40,27 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const forgotLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { message: "Demasiados intentos. Intenta de nuevo en 15 minutos." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  skip: (req) => req.originalUrl.startsWith("/api/auth/"),
+  message: { message: "Demasiadas solicitudes. Intenta de nuevo en 15 minutos." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 app.use("/api/auth/login", authLimiter);
 app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/forgot-password", forgotLimiter);
+app.use("/api", apiLimiter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {
@@ -80,7 +102,31 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/inventory", inventoryRoutes);
 
 const PORT = process.env.PORT || 3000;
+const SSL_KEY = process.env.SSL_KEY;
+const SSL_CERT = process.env.SSL_CERT;
 
-app.listen(PORT, () => {
-  logger.info(`Servidor iniciado en puerto ${PORT}, entorno: ${process.env.NODE_ENV || "development"}`);
-});
+async function start() {
+  try {
+    await runMigrations();
+  } catch (err) {
+    logger.error("Error en migraciones iniciales:", err.message);
+  }
+
+  if (SSL_KEY && SSL_CERT && fs.existsSync(SSL_KEY) && fs.existsSync(SSL_CERT)) {
+    https.createServer({
+      key: fs.readFileSync(SSL_KEY),
+      cert: fs.readFileSync(SSL_CERT),
+    }, app).listen(443, () => {
+      logger.info(`Servidor HTTPS iniciado en puerto 443`);
+    });
+    app.listen(PORT, () => {
+      logger.info(`Servidor HTTP iniciado en puerto ${PORT}, entorno: ${process.env.NODE_ENV || "development"}`);
+    });
+  } else {
+    app.listen(PORT, () => {
+      logger.info(`Servidor HTTP iniciado en puerto ${PORT}, entorno: ${process.env.NODE_ENV || "development"}`);
+    });
+  }
+}
+
+start();

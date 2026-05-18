@@ -102,7 +102,21 @@ const updateCompanySettings = async (req, res) => {
   }
 };
 
+const getCompanyStatus = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT company_name FROM company_settings LIMIT 1"
+    );
+    const configured = result.rows.length > 0 && result.rows[0].company_name;
+    res.json({ configured: !!configured });
+  } catch (error) {
+    logger.error(error);
+    res.status(500).json({ message: "Error verificando estado" });
+  }
+};
+
 module.exports = {
   getCompanySettings,
   updateCompanySettings,
+  getCompanyStatus,
 };
