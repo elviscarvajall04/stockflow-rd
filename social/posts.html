@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockFlow RD — Posts Instagram</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    font-family: 'Inter', system-ui, sans-serif;
+    gap: 40px;
+  }
+
+  .post {
+    width: 1080px;
+    height: 1080px;
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  /* === POST 1 — BRAND === */
+  .post-brand {
+    background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 50%, #7c3aed 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+    text-align: center;
+  }
+  .post-brand .logo {
+    width: 140px;
+    height: 140px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 56px;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 40px;
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+  .post-brand h1 {
+    font-size: 72px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .post-brand h1 span {
+    background: linear-gradient(135deg, #a78bfa, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .post-brand p {
+    font-size: 26px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 400;
+    line-height: 1.5;
+    max-width: 700px;
+  }
+  .post-brand .badge {
+    margin-top: 50px;
+    padding: 14px 40px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    font-size: 22px;
+    color: #fff;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+  }
+  .post-brand .badge svg { vertical-align: middle; margin-right: 10px; }
+
+  /* === POST 2 — INVENTARIO === */
+  .post-feature {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 80px;
+    position: relative;
+  }
+  .post-feature .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #eef2ff;
+    color: #4f46e5;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    align-self: flex-start;
+  }
+  .post-feature h2 {
+    font-size: 60px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  .post-feature h2 span { color: #4f46e5; }
+  .post-feature p {
+    font-size: 24px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 800px;
+  }
+  .post-feature .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .post-feature .grid-item {
+    padding: 24px;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 1px solid #f1f5f9;
+  }
+  .post-feature .grid-item .icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  .post-feature .grid-item h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+  .post-feature .grid-item p {
+    font-size: 16px;
+    color: #64748b;
+    margin: 0;
+  }
+
+  /* === POST 3 — VENTAS + NCF === */
+  .post-sales {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+  }
+  .post-sales .tag {
+    align-self: flex-start;
+    padding: 10px 20px;
+    background: rgba(255,255,255,0.08);
+    color: #a78bfa;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 28px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .post-sales h2 {
+    font-size: 58px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+  .post-sales h2 span { color: #a78bfa; }
+  .post-sales p {
+    font-size: 24px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+  .post-sales .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .post-sales .stat {
+    padding: 24px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .post-sales .stat .num {
+    font-size: 34px;
+    font-weight: 800;
+    color: #a78bfa;
+    margin-bottom: 4px;
+  }
+  .post-sales .stat .label {
+    font-size: 17px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* === POST 4 — DGII / ITBIS === */
+  .post-dgii {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .post-dgii::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(79,70,229,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .post-dgii .tag {
+    align-self: flex-start;
+    padding: 10px 20px;
+    background: #f0fdf4;
+    color: #059669;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 28px;
+  }
+  .post-dgii h2 {
+    font-size: 56px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+  }
+  .post-dgii h2 span { color: #059669; }
+  .post-dgii p {
+    font-size: 24px;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 36px;
+  }
+  .post-dgii .items {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .post-dgii .item {
+    padding: 24px;
+    background: #f8fafc;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid #f1f5f9;
+  }
+  .post-dgii .item .big {
+    font-size: 36px;
+    font-weight: 800;
+    color: #059669;
+  }
+  .post-dgii .item .desc {
+    font-size: 16px;
+    color: #64748b;
+    margin-top: 4px;
+  }
+
+  /* === POST 5 — CTA / LANZAMIENTO === */
+  .post-cta {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .post-cta::before {
+    content: '';
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+    top: -200px;
+    right: -300px;
+    border-radius: 50%;
+  }
+  .post-cta .emoji-big { font-size: 80px; margin-bottom: 30px; }
+  .post-cta h2 {
+    font-size: 64px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    letter-spacing: -1px;
+    position: relative;
+  }
+  .post-cta p {
+    font-size: 26px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+    margin-bottom: 40px;
+    max-width: 700px;
+    position: relative;
+  }
+  .post-cta .btn-cta {
+    padding: 20px 60px;
+    background: #fff;
+    color: #4f46e5;
+    border-radius: 60px;
+    font-size: 26px;
+    font-weight: 700;
+    border: none;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .post-cta .footer-note {
+    margin-top: 40px;
+    font-size: 18px;
+    color: rgba(255,255,255,0.4);
+    position: relative;
+  }
+
+  /* === POST 6 — FUNCIONALIDADES === */
+  .post-features {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px;
+  }
+  .post-features h2 {
+    font-size: 52px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 36px;
+    letter-spacing: -1px;
+    text-align: center;
+  }
+  .post-features h2 span { color: #4f46e5; }
+  .post-features .list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .post-features .list-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+  }
+  .post-features .list-item .check {
+    width: 36px;
+    height: 36px;
+    background: #4f46e5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .post-features .list-item .text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .post-features .list-item .sub {
+    font-size: 15px;
+    color: #64748b;
+  }
+  .toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+  .toolbar .label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-right: 8px;
+  }
+  .toolbar button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .toolbar button:hover { transform: translateY(-1px); }
+  .toolbar .btn-all {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+  }
+  .toolbar .btn-ind {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+  }
+  .toolbar .btn-ind:hover { background: #e2e8f0; }
+  body { padding-top: 80px; }
+
+</style>
+</head>
+<body>
+
+<div class="toolbar" id="toolbar">
+  <span class="label">📸 Descargar:</span>
+  <button class="btn-all" onclick="downloadAll()">⬇ Descargar todos</button>
+  <button class="btn-ind" onclick="downloadPost(0)">1 Brand</button>
+  <button class="btn-ind" onclick="downloadPost(1)">2 Inventario</button>
+  <button class="btn-ind" onclick="downloadPost(2)">3 Ventas+NCF</button>
+  <button class="btn-ind" onclick="downloadPost(3)">4 DGII</button>
+  <button class="btn-ind" onclick="downloadPost(4)">5 Features</button>
+  <button class="btn-ind" onclick="downloadPost(5)">6 CTA</button>
+</div>
+
+<!-- POST 1 — BRAND -->
+<div class="post post-brand">
+  <div class="logo">SF</div>
+  <h1>StockFlow<br><span>RD</span></h1>
+  <p>ERP inteligente para PYMEs dominicanas — control de inventario, ventas, NCF y reportes DGII</p>
+  <div class="badge">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    Hecho para cumplir con DGII
+  </div>
+</div>
+
+<!-- POST 2 — INVENTARIO -->
+<div class="post post-feature">
+  <div class="tag">📦 Inventario</div>
+  <h2>Control de <span>stock</span><br>en tiempo real</h2>
+  <p>Lleva el control exacto de tus productos con alertas de bajo stock y movimientos automatizados.</p>
+  <div class="grid">
+    <div class="grid-item">
+      <div class="icon">📊</div>
+      <h3>Kardex digital</h3>
+      <p>Historial completo de entradas y salidas por producto</p>
+    </div>
+    <div class="grid-item">
+      <div class="icon">🔔</div>
+      <h3>Alertas de stock</h3>
+      <p>Notificaciones cuando un producto está por agotarse</p>
+    </div>
+    <div class="grid-item">
+      <div class="icon">🔄</div>
+      <h3>Auto-actualización</h3>
+      <p>Compras y ventas ajustan el inventario automáticamente</p>
+    </div>
+    <div class="grid-item">
+      <div class="icon">📋</div>
+      <h3>Categorías</h3>
+      <p>Organiza tus productos por familias y subgrupos</p>
+    </div>
+  </div>
+</div>
+
+<!-- POST 3 — VENTAS + NCF -->
+<div class="post post-sales">
+  <div class="tag">🧾 Ventas + NCF</div>
+  <h2>Facturación <span>fiscal</span><br>sin complicaciones</h2>
+  <p>Genera NCF automáticos (B01 y B02) con ITBIS calculado al instante. Facturas fiscales listas para la DGII.</p>
+  <div class="stats">
+    <div class="stat">
+      <div class="num">B01</div>
+      <div class="label">Consumidor Final</div>
+    </div>
+    <div class="stat">
+      <div class="num">B02</div>
+      <div class="label">Crédito Fiscal</div>
+    </div>
+    <div class="stat">
+      <div class="num">18%</div>
+      <div class="label">ITBIS General</div>
+    </div>
+    <div class="stat">
+      <div class="num">0%</div>
+      <div class="label">ITBIS Exento</div>
+    </div>
+  </div>
+</div>
+
+<!-- POST 4 — DGII -->
+<div class="post post-dgii">
+  <div class="tag">📑 Reportes DGII</div>
+  <h2>Cumplimiento <span>fiscal</span><br>siempre al día</h2>
+  <p>Genera los reportes 606 y 607 que exige la DGII con un solo clic. Sin hojas de cálculo ni dolores de cabeza.</p>
+  <div class="items">
+    <div class="item">
+      <div class="big">606</div>
+      <div class="desc">Compras del mes</div>
+    </div>
+    <div class="item">
+      <div class="big">607</div>
+      <div class="desc">Ventas del mes</div>
+    </div>
+    <div class="item">
+      <div class="big">✅</div>
+      <div class="desc">Formato DGII listo</div>
+    </div>
+  </div>
+</div>
+
+<!-- POST 5 — TODAS LAS FUNCIONALIDADES -->
+<div class="post post-features">
+  <h2>Todo lo que tu negocio <span>necesita</span></h2>
+  <div class="list">
+    <div class="list-item">
+      <div class="check">✓</div>
+      <div><div class="text">Inventario</div><div class="sub">Kardex, alertas, categorías</div></div>
+    </div>
+    <div class="list-item">
+      <div class="check">✓</div>
+      <div><div class="text">Ventas</div><div class="sub">NCF B01/B02, ITBIS automático</div></div>
+    </div>
+    <div class="list-item">
+      <div class="check">✓</div>
+      <div><div class="text">Compras</div><div class="sub">Proveedores, gastos, entradas</div></div>
+    </div>
+    <div class="list-item">
+      <div class="check">✓</div>
+      <div><div class="text">Reportes DGII</div><div class="sub">606, 607, ganancias</div></div>
+    </div>
+    <div class="list-item">
+      <div class="check">✓</div>
+      <div><div class="text">Usuarios</div><div class="sub">Admin + empleados con roles</div></div>
+    </div>
+    <div class="list-item">
+      <div class="check">✓</div>
+      <div><div class="text">Dashboard</div><div class="sub">Métricas en tiempo real</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- POST 6 — CTA -->
+<div class="post post-cta">
+  <div class="emoji-big">🚀</div>
+  <h2>¿Listo para<br>digitalizar tu negocio?</h2>
+  <p>StockFlow RD — el ERP dominicano que entiende tus necesidades fiscales y de inventario</p>
+  <div class="btn-cta">Contáctanos hoy</div>
+  <div class="footer-note">StockFlow RD · ERP para PYMEs dominicanas</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const posts = document.querySelectorAll('.post');
+const filenames = [
+  'stockflow-brand',
+  'stockflow-inventario',
+  'stockflow-ventas-ncf',
+  'stockflow-dgii',
+  'stockflow-features',
+  'stockflow-cta',
+];
+
+function downloadPost(index) {
+  const el = posts[index];
+  const btn = document.querySelectorAll('.toolbar button')[index + 1];
+  const orig = btn.textContent;
+  btn.textContent = '⏳';
+  btn.disabled = true;
+  html2canvas(el, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: null,
+    logging: false,
+  }).then((canvas) => {
+    const link = document.createElement('a');
+    link.download = filenames[index] + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    btn.textContent = '✅';
+    setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+  });
+}
+
+function downloadAll() {
+  const btn = document.querySelector('.btn-all');
+  btn.textContent = '⏳ Descargando...';
+  btn.disabled = true;
+  let i = 0;
+  function next() {
+    if (i >= posts.length) {
+      btn.textContent = '✅ Descargados';
+      setTimeout(() => {
+        btn.textContent = '⬇ Descargar todos';
+        btn.disabled = false;
+      }, 2000);
+      return;
+    }
+    const el = posts[i];
+    html2canvas(el, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: null,
+      logging: false,
+    }).then((canvas) => {
+      const link = document.createElement('a');
+      link.download = filenames[i] + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      i++;
+      setTimeout(next, 500);
+    });
+  }
+  next();
+}
+</script>
+</body>
+</html>

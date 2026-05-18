@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockFlow RD — ERP para PYMEs Dominicanas</title>
+<meta name="description" content="StockFlow RD es el ERP dominicano para PYMEs. Control de inventario, ventas con NCF, facturación fiscal y reportes DGII 606/607. Hecho en RD para RD.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #0f172a;
+    background: #fff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* === NAV === */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.9); backdrop-filter: blur(16px);
+    border-bottom: 1px solid #f1f5f9;
+  }
+  nav .container {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  nav .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 20px; font-weight: 800; color: #0f172a;
+    text-decoration: none;
+  }
+  nav .logo .mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px;
+  }
+  nav .links { display: flex; align-items: center; gap: 32px; }
+  nav .links a {
+    font-size: 14px; font-weight: 500; color: #475569;
+    text-decoration: none; transition: color 0.2s;
+  }
+  nav .links a:hover { color: #4f46e5; }
+  nav .links .btn-nav {
+    padding: 9px 22px; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff; border-radius: 8px; font-weight: 600;
+  }
+  nav .links .btn-nav:hover { color: #fff; opacity: 0.9; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; }
+  .hamburger span { width: 24px; height: 2px; background: #0f172a; border-radius: 2px; }
+
+  /* === HERO === */
+  .hero {
+    padding: 140px 0 80px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f0fdf4 100%);
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(79,70,229,0.06) 0%, transparent 60%);
+    top: -200px; right: -200px; border-radius: 50%;
+  }
+  .hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; }
+  .hero h1 {
+    font-size: 48px; font-weight: 900; letter-spacing: -1.5px;
+    line-height: 1.1; margin-bottom: 20px;
+  }
+  .hero h1 span { background: linear-gradient(135deg, #4f46e5, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p {
+    font-size: 18px; color: #64748b; line-height: 1.7;
+    margin-bottom: 32px; max-width: 500px;
+  }
+  .hero .btns { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero .btn-primary {
+    padding: 14px 32px; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff; border: none; border-radius: 10px; font-size: 16px;
+    font-weight: 600; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .hero .btn-secondary {
+    padding: 14px 32px; background: #fff; color: #4f46e5;
+    border: 2px solid #e2e8f0; border-radius: 10px; font-size: 16px;
+    font-weight: 600; cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .hero .stats-hero { display: flex; gap: 40px; margin-top: 40px; }
+  .hero .stat-hero .num { font-size: 28px; font-weight: 800; color: #0f172a; }
+  .hero .stat-hero .label { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+  .hero .mockup {
+    background: #fff; border-radius: 20px; box-shadow: 0 24px 80px rgba(0,0,0,0.1);
+    border: 1px solid #f1f5f9; overflow: hidden;
+  }
+  .hero .mockup .bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid #f1f5f9;
+  }
+  .hero .mockup .bar .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .hero .mockup .bar .dot:nth-child(1) { background: #ef4444; }
+  .hero .mockup .bar .dot:nth-child(2) { background: #f59e0b; }
+  .hero .mockup .bar .dot:nth-child(3) { background: #10b981; }
+  .hero .mockup .body { padding: 24px; }
+  .hero .mockup .body .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f8fafc; font-size: 13px; }
+  .hero .mockup .body .row .l { color: #94a3b8; }
+  .hero .mockup .body .row .r { font-weight: 600; color: #0f172a; }
+  .hero .mockup .body .row .r.green { color: #059669; }
+  .hero .mockup .body .row .r.purple { color: #4f46e5; }
+
+  /* === SECTION (shared) === */
+  section { padding: 80px 0; }
+  section .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; background: #eef2ff; color: #4f46e5;
+    border-radius: 50px; font-size: 13px; font-weight: 600;
+    margin-bottom: 16px;
+  }
+  section h2 {
+    font-size: 36px; font-weight: 800; letter-spacing: -1px;
+    margin-bottom: 16px; line-height: 1.15;
+  }
+  section h2 span { color: #4f46e5; }
+  section .sub {
+    font-size: 17px; color: #64748b; line-height: 1.7;
+    max-width: 600px; margin-bottom: 40px;
+  }
+
+  /* === PROBLEM === */
+  .problem { background: #fff; }
+  .problem .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .problem .card {
+    padding: 28px; background: #fef2f2; border-radius: 16px;
+    border: 1px solid #fecaca;
+  }
+  .problem .card .icon { font-size: 28px; margin-bottom: 14px; }
+  .problem .card h3 { font-size: 16px; font-weight: 700; color: #991b1b; margin-bottom: 6px; }
+  .problem .card p { font-size: 14px; color: #7f1d1d; line-height: 1.6; }
+
+  /* === FEATURES === */
+  .features { background: #f8fafc; }
+  .features .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .features .card {
+    padding: 28px; background: #fff; border-radius: 16px;
+    border: 1px solid #f1f5f9; transition: all 0.2s;
+  }
+  .features .card:hover { border-color: #c7d2fe; box-shadow: 0 8px 24px rgba(79,70,229,0.06); }
+  .features .card .icon { font-size: 32px; margin-bottom: 14px; }
+  .features .card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .features .card p { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+  /* === DGII === */
+  .dgii { background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; }
+  .dgii .tag { background: rgba(255,255,255,0.08); color: #34d399; border: 1px solid rgba(255,255,255,0.08); }
+  .dgii h2 { color: #fff; }
+  .dgii h2 span { color: #34d399; }
+  .dgii .sub { color: rgba(255,255,255,0.6); }
+  .dgii .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .dgii .card {
+    padding: 28px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  }
+  .dgii .card .icon { font-size: 32px; margin-bottom: 12px; }
+  .dgii .card h3 { font-size: 17px; font-weight: 700; color: #34d399; margin-bottom: 8px; }
+  .dgii .card p { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+  /* === DIFFERENTIATORS === */
+  .diff { background: #fff; }
+  .diff .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .diff .card {
+    padding: 28px; background: #f0fdf4; border-radius: 16px;
+    border: 1px solid #bbf7d0;
+  }
+  .diff .card .icon { font-size: 28px; margin-bottom: 12px; }
+  .diff .card h3 { font-size: 16px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+  .diff .card p { font-size: 14px; color: #15803d; line-height: 1.5; }
+
+  /* === PLANS === */
+  .plans { background: #f8fafc; }
+  .plans .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
+  .plans .card {
+    padding: 36px; background: #fff; border-radius: 20px;
+    border: 2px solid #e2e8f0; text-align: center; position: relative;
+  }
+  .plans .card.featured {
+    border-color: #4f46e5; transform: scale(1.05);
+    box-shadow: 0 16px 48px rgba(79,70,229,0.12);
+  }
+  .plans .card .popular {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    padding: 4px 20px; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff; border-radius: 50px; font-size: 12px; font-weight: 600;
+  }
+  .plans .card h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .plans .card .price { font-size: 40px; font-weight: 900; color: #4f46e5; margin-bottom: 2px; }
+  .plans .card .period { font-size: 14px; color: #94a3b8; margin-bottom: 24px; }
+  .plans .card ul { list-style: none; text-align: left; margin-bottom: 28px; }
+  .plans .card li {
+    padding: 8px 0; font-size: 14px; color: #475569; display: flex; gap: 10px;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .plans .card li::before { content: '✓'; color: #4f46e5; font-weight: 700; }
+  .plans .card .btn-plan {
+    display: block; padding: 12px; background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff; border: none; border-radius: 10px; font-size: 15px;
+    font-weight: 600; cursor: pointer; text-decoration: none; width: 100%;
+  }
+  .plans .card .btn-plan-outline {
+    display: block; padding: 12px; background: #fff; color: #4f46e5;
+    border: 2px solid #e2e8f0; border-radius: 10px; font-size: 15px;
+    font-weight: 600; cursor: pointer; text-decoration: none; width: 100%;
+  }
+
+  /* === FAQ === */
+  .faq { background: #fff; }
+  .faq .list { max-width: 800px; margin: 0 auto; }
+  .faq details {
+    padding: 20px 0; border-bottom: 1px solid #f1f5f9;
+    cursor: pointer;
+  }
+  .faq details summary {
+    font-size: 16px; font-weight: 600; color: #0f172a;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .faq details summary::after {
+    content: '+'; font-size: 20px; color: #94a3b8; font-weight: 300;
+  }
+  .faq details[open] summary::after { content: '−'; }
+  .faq details p {
+    font-size: 15px; color: #64748b; line-height: 1.7;
+    margin-top: 12px; max-width: 700px;
+  }
+
+  /* === CTA === */
+  .cta {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    padding: 80px 0; text-align: center; color: #fff;
+  }
+  .cta h2 { font-size: 40px; font-weight: 900; margin-bottom: 12px; color: #fff; }
+  .cta p { font-size: 18px; color: rgba(255,255,255,0.8); max-width: 500px; margin: 0 auto 32px; line-height: 1.6; }
+  .cta .btn-whatsapp {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 40px; background: #25D366; color: #fff;
+    border-radius: 12px; font-size: 18px; font-weight: 700;
+    text-decoration: none; transition: transform 0.2s;
+  }
+  .cta .btn-whatsapp:hover { transform: scale(1.03); }
+  .cta .or { color: rgba(255,255,255,0.5); margin: 12px 0; font-size: 14px; }
+  .cta .btn-email {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 32px; background: rgba(255,255,255,0.1);
+    color: #fff; border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px; font-size: 15px; font-weight: 600;
+    text-decoration: none; transition: background 0.2s;
+  }
+  .cta .btn-email:hover { background: rgba(255,255,255,0.15); }
+
+  /* === FOOTER === */
+  footer { background: #0f172a; padding: 40px 0; color: #94a3b8; font-size: 14px; }
+  footer .container { display: flex; justify-content: space-between; align-items: center; }
+  footer .brand { font-weight: 700; color: #fff; }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 968px) {
+    .hero .container { grid-template-columns: 1fr; }
+    .hero .mockup { display: none; }
+    .hero h1 { font-size: 36px; }
+    .problem .grid { grid-template-columns: 1fr 1fr; }
+    .features .grid { grid-template-columns: 1fr 1fr; }
+    .plans .cards { grid-template-columns: 1fr; }
+    .plans .card.featured { transform: none; }
+    .diff .grid { grid-template-columns: 1fr 1fr; }
+    .dgii .grid { grid-template-columns: 1fr; }
+    nav .links { display: none; }
+    .hamburger { display: flex; }
+  }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 28px; }
+    .problem .grid, .features .grid, .diff .grid { grid-template-columns: 1fr; }
+    section h2 { font-size: 26px; }
+    .hero .stats-hero { gap: 20px; flex-wrap: wrap; }
+    footer .container { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="container">
+    <a href="#" class="logo">
+      <div class="mark">SF</div>
+      StockFlow RD
+    </a>
+    <div class="links">
+      <a href="#problema">El problema</a>
+      <a href="#funcionalidades">Funcionalidades</a>
+      <a href="#dgii">DGII</a>
+      <a href="#planes">Planes</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contacto" class="btn-nav">Contáctanos</a>
+    </div>
+    <button class="hamburger" onclick="document.querySelector('nav .links').style.display='flex'" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container">
+    <div>
+      <h1>El ERP que tu negocio <span>dominicano</span> necesita</h1>
+      <p>Control de inventario, ventas con NCF, facturación fiscal y reportes DGII 606/607 en un solo sistema. Hecho en República Dominicana para PYMEs como la tuya.</p>
+      <div class="btns">
+        <a href="#contacto" class="btn-primary">Solicitar demo gratis</a>
+        <a href="#funcionalidades" class="btn-secondary">Ver funcionalidades</a>
+      </div>
+      <div class="stats-hero">
+        <div><div class="num">55+</div><div class="label">Productos</div></div>
+        <div><div class="num">9</div><div class="label">Categorías</div></div>
+        <div><div class="num">8</div><div class="label">Clientes</div></div>
+        <div><div class="num">2</div><div class="label">Tipos NCF</div></div>
+      </div>
+    </div>
+    <div class="mockup">
+      <div class="bar">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        <span style="font-size:12px;color:#94a3b8;margin-left:8px;">StockFlow RD · Dashboard</span>
+      </div>
+      <div class="body">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;">📊 Resumen del negocio</div>
+        <div class="row"><span class="l">Ventas totales</span><span class="r purple">RD$ 59,295</span></div>
+        <div class="row"><span class="l">Productos activos</span><span class="r">55</span></div>
+        <div class="row"><span class="l">Clientes registrados</span><span class="r">8</span></div>
+        <div class="row"><span class="l">ITBIS acumulado</span><span class="r green">RD$ 9,042</span></div>
+        <div class="row"><span class="l">Ventas hoy</span><span class="r purple">RD$ 2,250</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROBLEMA ============ -->
+<section class="problem" id="problema">
+  <div class="container">
+    <div class="tag">⚠️ ¿Te identificas?</div>
+    <h2>¿Por qué muchos negocios en RD<br>pierden tiempo y dinero?</h2>
+    <p class="sub">Si usas Excel, facturas a mano o no tienes control de tu inventario, esto te suena familiar:</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">📝</div>
+        <h3>Facturación manual</h3>
+        <p>Facturas en Excel o a mano que se pierden, se duplican o no cumplen con los requisitos de la DGII.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Inventario descontrolado</h3>
+        <p>No sabes qué tienes, qué se vendió o qué comprar. Roturas de stock o dinero congelado en inventario muerto.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🧾</div>
+        <h3>Multas DGII</h3>
+        <p>Reportes 606/607 fuera de fecha, NCF mal emitidos, ITBIS mal calculado. Multas de hasta RD$ 250,000.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📊</div>
+        <h3>Sin visibilidad</h3>
+        <p>No sabes si estás ganando o perdiendo. Sin métricas de ventas, márgenes o rentabilidad en tiempo real.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FUNCIONALIDADES ============ -->
+<section class="features" id="funcionalidades">
+  <div class="container">
+    <div class="tag">⚡ Funcionalidades</div>
+    <h2>Todo lo que necesitas en<br>un solo <span>sistema</span></h2>
+    <p class="sub">StockFlow RD integra cada aspecto de tu negocio en una plataforma unificada y fácil de usar.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Control de inventario</h3>
+        <p>Kardex digital con historial completo de movimientos. Alertas de stock bajo. Categorías personalizables.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🧾</div>
+        <h3>Facturación con NCF</h3>
+        <p>Genera NCF tipo B01 y B02 automáticamente. ITBIS calculado al instante. Secuencias controladas por vigencia.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📑</div>
+        <h3>Reportes DGII 606/607</h3>
+        <p>Exporta los reportes mensuales que exige la DGII con un clic. Sin Excel ni procesos manuales.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📊</div>
+        <h3>Dashboard en vivo</h3>
+        <p>Ventas del día, productos más vendidos, rentabilidad, ITBIS acumulado. Todo en tiempo real.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🛒</div>
+        <h3>Compras y proveedores</h3>
+        <p>Registra compras con costo por producto. Actualización automática del inventario. Control de gastos.</p>
+      </div>
+      <div class="card">
+        <div class="icon">👥</div>
+        <h3>Usuarios con roles</h3>
+        <p>Administradores y empleados con permisos diferenciados. Seguridad JWT con renovación automática.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📱</div>
+        <h3>Acceso web</h3>
+        <p>Funciona en cualquier navegador. Escritorio, tablet o móvil. Sin instalaciones complicadas.</p>
+      </div>
+      <div class="card">
+        <div class="icon">💰</div>
+        <h3>Reporte de ganancias</h3>
+        <p>Calcula tu margen por producto y período. Costos vs precio de venta. ITBIS desglosado.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔒</div>
+        <h3>Seguro y confiable</h3>
+        <p>Contraseñas encriptadas, rate limiting, backups automáticos. Tu información siempre protegida.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DGII ============ -->
+<section class="dgii" id="dgii">
+  <div class="container">
+    <div class="tag">🇩🇴 Cumplimiento DGII</div>
+    <h2>Cumplimiento fiscal dominicano<br><span>sin dolores de cabeza</span></h2>
+    <p class="sub">StockFlow RD nació en RD para RD. Cada funcionalidad está diseñada pensando en las regulaciones de la DGII.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">🧾</div>
+        <h3>Comprobantes Fiscales</h3>
+        <p>B01 para consumidor final y B02 para crédito fiscal. Secuencia numérica controlada con rango y vigencia. Anulación de facturas con restauración de stock.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📑</div>
+        <h3>Reporte 606 — Compras</h3>
+        <p>Detalle mensual de todas las compras con proveedores, NCF, ITBIS recuperable. Formato oficial listo para enviar a la DGII.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📑</div>
+        <h3>Reporte 607 — Ventas</h3>
+        <p>Detalle mensual de todas las ventas con clientes, NCF emitidos, ITBIS cobrado. Generado automáticamente desde tus transacciones.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DIFERENCIADORES ============ -->
+<section class="diff">
+  <div class="container">
+    <div class="tag">🌟 ¿Por qué StockFlow RD es único?</div>
+    <h2>Lo que nos hace <span>diferentes</span></h2>
+    <p class="sub">No somos un ERP genérico adaptado al mercado dominicano. Nacimos aquí, pensando en tus necesidades reales.</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">🇩🇴</div>
+        <h3>Hecho en RD para RD</h3>
+        <p>No es una traducción. NCF, ITBIS, DGII, 606, 607 son funcionalidades nativas, no parches. Entendemos las regulaciones locales porque las vivimos.</p>
+      </div>
+      <div class="card">
+        <div class="icon">💰</div>
+        <h3>Sin costos ocultos</h3>
+        <p>Precio único mensual. Sin límite de productos, sin cobro por usuario extra, sin cargos por soporte. Lo que ves es lo que pagas.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🚀</div>
+        <h3>Implementación express</h3>
+        <p>En menos de 1 hora tu negocio está funcionando. Productos cargados, clientes registrados, primer NCF emitido. Sin semanas de implementación.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🎯</div>
+        <h3>Diseñado para PYMEs</h3>
+        <p>Interfaz limpia y sencilla. Tu equipo lo usará desde el día 1 sin capacitación costosa. Curva de aprendizaje mínima.</p>
+      </div>
+      <div class="card">
+        <div class="icon">☁️</div>
+        <h3>En la nube, siempre accesible</h3>
+        <p>Accede desde cualquier lugar con internet. Sin instalaciones, sin servidores, sin mantenimiento técnico. Nosotros nos encargamos.</p>
+      </div>
+      <div class="card">
+        <div class="icon">📞</div>
+        <h3>Soporte en español</h3>
+        <p>Atención personalizada por WhatsApp. No máquinas, no tickets que nadie responde. Hablas con alguien que entiende tu negocio.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLANES ============ -->
+<section class="plans" id="planes">
+  <div class="container">
+    <div class="tag">💲 Planes mensuales</div>
+    <h2>Precios pensados para<br>tu <span>negocio</span></h2>
+    <p class="sub">Elige el plan que mejor se adapte a tu operación. Todos incluyen acceso web, soporte y actualizaciones.</p>
+    <div class="cards">
+      <div class="card">
+        <h3>Básico</h3>
+        <div class="price">RD$ 1,500</div>
+        <div class="period">por mes</div>
+        <ul>
+          <li>Hasta 200 productos</li>
+          <li>Hasta 3 usuarios</li>
+          <li>Inventario básico</li>
+          <li>Ventas con NCF</li>
+          <li>Dashboard</li>
+          <li>Soporte por email</li>
+        </ul>
+        <a href="#contacto" class="btn-plan-outline">Seleccionar</a>
+      </div>
+      <div class="card featured">
+        <div class="popular">Más popular</div>
+        <h3>Profesional</h3>
+        <div class="price">RD$ 3,500</div>
+        <div class="period">por mes</div>
+        <ul>
+          <li>Productos ilimitados</li>
+          <li>Usuarios ilimitados</li>
+          <li>Inventario + Kardex + Alertas</li>
+          <li>Ventas + Compras + NCF</li>
+          <li>Reportes DGII 606/607</li>
+          <li>Dashboard + métricas avanzadas</li>
+          <li>Soporte prioritario WhatsApp</li>
+        </ul>
+        <a href="#contacto" class="btn-plan">Seleccionar</a>
+      </div>
+      <div class="card">
+        <h3>Enterprise</h3>
+        <div class="price">RD$ 7,500</div>
+        <div class="period">por mes</div>
+        <ul>
+          <li>Todo el plan Profesional</li>
+          <li>Servidor dedicado</li>
+          <li>SSL personalizado</li>
+          <li>Backups diarios automáticos</li>
+          <li>Horas de capacitación</li>
+          <li>Base de datos dedicada</li>
+          <li>Soporte 24/7 prioritario</li>
+        </ul>
+        <a href="#contacto" class="btn-plan-outline">Seleccionar</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="tag" style="margin:0 auto 16px; display:table;">❓ FAQ</div>
+    <h2 style="text-align:center;">Preguntas <span>frecuentes</span></h2>
+    <div class="list">
+      <details>
+        <summary>¿Necesito instalar algo en mi computadora?</summary>
+        <p>No. StockFlow RD es 100% web. Solo necesitas un navegador (Chrome, Edge, Safari) y conexión a internet. Funciona en PC, Mac, tablet y celular.</p>
+      </details>
+      <details>
+        <summary>¿Cómo maneja los NCF y la DGII?</summary>
+        <p>El sistema asigna automáticamente NCF tipo B01 (Consumidor Final) o B02 (Crédito Fiscal) según el cliente. Controla las secuencias por rango y vigencia. Los reportes 606 y 607 se generan con un clic en formato oficial DGII.</p>
+      </details>
+      <details>
+        <summary>¿Puedo probarlo antes de pagar?</summary>
+        <p>Sí. Ofrecemos una demostración gratuita sin compromiso. Te enseñamos el sistema con tus propios productos y te explicamos cómo puede ayudar a tu negocio. Contáctanos por WhatsApp para agendarla.</p>
+      </details>
+      <details>
+        <summary>¿Qué pasa si tengo más de 3 usuarios?</summary>
+        <p>El plan Básico incluye hasta 3 usuarios. Si necesitas más, el plan Profesional no tiene límite de usuarios. Perfecto para equipos en crecimiento.</p>
+      </details>
+      <details>
+        <summary>¿Puedo facturar con ITBIS 0% o 16%?</summary>
+        <p>Sí. Cada producto tiene su propio porcentaje de ITBIS (18%, 16% o 0%). El sistema calcula automáticamente el impuesto correcto según el producto. Los productos exentos (0%) también están soportados.</p>
+      </details>
+      <details>
+        <summary>¿Qué tipo de negocios usan StockFlow RD?</summary>
+        <p>Tiendas físicas, colmados, ferreterías, farmacias, distribuidoras, licoreras, bares, restaurantes, boutiques — cualquier PYME que venda productos y necesite cumplir con la DGII.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta" id="contacto">
+  <div class="container">
+    <h2>¿Listo para digitalizar tu negocio?</h2>
+    <p>Habla con nosotros hoy y descubre cómo StockFlow RD puede transformar tu negocio.</p>
+    <a href="https://wa.me/18296022607?text=Hola%20quiero%20informaci%C3%B3n%20sobre%20StockFlow%20RD" class="btn-whatsapp" target="_blank" rel="noopener">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Escríbenos a WhatsApp
+    </a>
+    <div class="or">o contáctanos por email</div>
+    <a href="mailto:elvispcarvajal04@gmail.com" class="btn-email">✉️ elvispcarvajal04@gmail.com</a>
+    <div style="margin-top:20px; font-size:15px; color:rgba(255,255,255,0.6);">
+      📞 WhatsApp: <strong style="color:#fff;">829-602-2607</strong> · Email: <strong style="color:#fff;">elvispcarvajal04@gmail.com</strong>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="brand">StockFlow RD</div>
+    <div>© 2026 StockFlow RD. Todos los derechos reservados.</div>
+    <div>Hecho con ❤️ en República Dominicana</div>
+  </div>
+</footer>
+
+</body>
+</html>

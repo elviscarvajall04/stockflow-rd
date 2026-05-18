@@ -9,6 +9,9 @@ require("dotenv").config();
 const logger = require("./config/logger");
 const runMigrations = require("./runMigrations");
 
+const isProduction = process.env.NODE_ENV === "production";
+const frontendDist = path.join(__dirname, "../stockflow-frontend/dist");
+
 const productRoutes = require("./routes/productRoutes");
 const saleRoutes = require("./routes/saleRoutes");
 const reportRoutes = require("./routes/reportRoutes");
@@ -100,6 +103,17 @@ app.use("/api/purchases", purchaseRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/inventory", inventoryRoutes);
+
+if (isProduction && fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    if (req.path.startsWith("/health")) return next();
+    if (req.path.startsWith("/uploads")) return next();
+    res.sendFile(path.join(frontendDist, "index.html"));
+  });
+  logger.info(`Sirviendo frontend estático desde ${frontendDist}`);
+}
 
 const PORT = process.env.PORT || 3000;
 const SSL_KEY = process.env.SSL_KEY;

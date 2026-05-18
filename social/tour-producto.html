@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockFlow RD — Tour del Producto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #f1f5f9; padding: 0; color: #0f172a;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .slide {
+    width: 1280px; height: 720px; position: relative; overflow: hidden;
+    page-break-after: always; break-after: page;
+    display: flex; flex-direction: column;
+  }
+
+  /* === HEADER BAR (app-like) === */
+  .app-header {
+    display: flex; align-items: center; gap: 24px;
+    padding: 12px 28px; background: #fff;
+    border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
+  }
+  .app-header .brand {
+    font-size: 18px; font-weight: 800; color: #4f46e5;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .app-header .brand .logo {
+    width: 32px; height: 32px; background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px; font-weight: 900;
+  }
+  .app-header .nav { display: flex; gap: 4px; flex: 1; }
+  .app-header .nav a {
+    padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    color: #64748b; text-decoration: none;
+  }
+  .app-header .nav a.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
+  .app-header .user {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 14px; background: #f8fafc; border-radius: 8px;
+    font-size: 13px; font-weight: 600; color: #334155;
+  }
+  .app-header .user .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg,#4f46e5,#7c3aed);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+
+  /* === PAGE HEADER === */
+  .page-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 24px 28px 0; flex-shrink: 0;
+  }
+  .page-header h1 { font-size: 22px; font-weight: 700; }
+  .page-header p { font-size: 13px; color: #64748b; margin-top: 2px; }
+  .page-header .btn { padding: 8px 20px; background: linear-gradient(135deg,#4f46e5,#7c3aed); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; }
+
+  /* === TABLE === */
+  .table-wrap {
+    margin: 16px 28px; background: #fff; border-radius: 12px;
+    border: 1px solid #f1f5f9; overflow: hidden; flex: 1;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; font-size: 11px; font-weight: 600; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 12px 18px; border-bottom: 1px solid #f1f5f9; background: #fafafa;
+  }
+  td {
+    padding: 11px 18px; font-size: 13px; color: #334155;
+    border-bottom: 1px solid #f8fafc;
+  }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 6px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge-admin { background: #eef2ff; color: #4f46e5; }
+  .badge-employee { background: #ecfeff; color: #0891b2; }
+  .badge-stock { background: #fef2f2; color: #dc2626; }
+  .badge-stock-ok { background: #f0fdf4; color: #059669; }
+  .badge-ncf { background: #f8fafc; color: #64748b; font-family: monospace; font-size: 11px; }
+
+  /* === STAT CARDS === */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px 28px 0; flex-shrink: 0; }
+  .stat-card {
+    padding: 18px 20px; background: #fff; border-radius: 12px;
+    border: 1px solid #f1f5f9;
+  }
+  .stat-card .num { font-size: 24px; font-weight: 800; color: #0f172a; }
+  .stat-card .label { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .stat-card .change { font-size: 11px; font-weight: 600; margin-top: 6px; }
+  .stat-card .change.up { color: #059669; }
+  .stat-card .change.down { color: #dc2626; }
+
+  /* === SLIDE CONTENT (for description slides) === */
+  .slide-content { padding: 40px 60px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .slide-tag {
+    display: inline-flex; align-self: flex-start; padding: 6px 16px;
+    background: #eef2ff; color: #4f46e5; border-radius: 50px;
+    font-size: 12px; font-weight: 600; margin-bottom: 16px;
+  }
+  .slide-content h2 { font-size: 36px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.5px; }
+  .slide-content p { font-size: 16px; color: #64748b; line-height: 1.7; max-width: 700px; }
+  .slide-content .features-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+  .slide-content .features-list li {
+    list-style: none; padding: 10px 14px; background: #f8fafc;
+    border-radius: 8px; font-size: 14px; color: #334155; display: flex; gap: 10px; align-items: center;
+  }
+  .slide-content .features-list li::before { content: '✓'; color: #4f46e5; font-weight: 700; }
+
+  .slide-number {
+    position: absolute; bottom: 16px; right: 28px;
+    font-size: 12px; color: #94a3b8; font-weight: 500;
+  }
+  .slide-dark .slide-number { color: rgba(255,255,255,0.3); }
+
+  /* === Full dark slides === */
+  .slide-dark { background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; }
+  .slide-dark h2 { color: #fff; }
+  .slide-dark p { color: rgba(255,255,255,0.7); }
+
+  .slide-cover {
+    background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 50%, #7c3aed 100%);
+    color: #fff; align-items: center; justify-content: center; text-align: center;
+  }
+  .slide-cover .logo {
+    width: 100px; height: 100px; background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.15); border-radius: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; font-weight: 900; margin-bottom: 24px;
+  }
+  .slide-cover h1 { font-size: 52px; font-weight: 900; letter-spacing: -1px; margin-bottom: 8px; }
+  .slide-cover h1 span { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .slide-cover p { font-size: 18px; color: rgba(255,255,255,0.7); max-width: 600px; }
+
+  .slide-end { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; align-items: center; justify-content: center; text-align: center; }
+  .slide-end h2 { font-size: 44px; font-weight: 900; margin-bottom: 12px; }
+  .slide-end p { font-size: 18px; color: rgba(255,255,255,0.8); max-width: 500px; }
+
+  /* Layout helpers */
+  .flex-row { display: flex; gap: 24px; flex: 1; padding: 16px 28px; }
+  .flex-1 { flex: 1; }
+  .flex-2 { flex: 2; }
+
+  /* Sidebar mini */
+  .sidebar {
+    width: 220px; background: #fff; border-radius: 12px;
+    border: 1px solid #f1f5f9; padding: 16px 0; flex-shrink: 0;
+  }
+  .sidebar a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 18px; font-size: 13px; color: #64748b; text-decoration: none;
+  }
+  .sidebar a.active { background: #eef2ff; color: #4f46e5; font-weight: 600; border-right: 3px solid #4f46e5; }
+
+  /* Charts */
+  .chart-bar {
+    display: flex; align-items: flex-end; gap: 8px; height: 100px; padding: 10px 0;
+  }
+  .chart-bar .bar {
+    flex: 1; border-radius: 4px 4px 0 0;
+    background: linear-gradient(180deg, #4f46e5, #a78bfa);
+    min-height: 10px;
+  }
+
+  /* Product cards */
+  .prod-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .prod-card {
+    padding: 14px; background: #fff; border-radius: 10px;
+    border: 1px solid #f1f5f9;
+  }
+  .prod-card .name { font-size: 13px; font-weight: 600; }
+  .prod-card .price { font-size: 15px; font-weight: 800; color: #4f46e5; margin-top: 4px; }
+  .prod-card .stock { font-size: 11px; color: #64748b; margin-top: 2px; }
+
+  .detail-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #f8fafc; }
+  .detail-row .l { color: #64748b; }
+  .detail-row .r { font-weight: 600; }
+
+  .ncf-box { font-family: monospace; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<div class="slide slide-cover">
+  <div class="logo">SF</div>
+  <h1>StockFlow <span>RD</span></h1>
+  <p>Tour del Producto · Recorrido completo por el ERP dominicano para PYMEs</p>
+  <div style="margin-top:40px; font-size:14px; color:rgba(255,255,255,0.4);">Presentación comercial · 2026</div>
+  <div class="slide-number" style="color:rgba(255,255,255,0.3);">01 / 12</div>
+</div>
+
+<!-- ==================== INTRO ==================== -->
+<div class="slide slide-dark" style="justify-content:center; padding:0 80px;">
+  <div class="slide-tag" style="background:rgba(255,255,255,0.08); color:#a78bfa; border:1px solid rgba(255,255,255,0.1);">📋 Visión general</div>
+  <h2 style="font-size:40px; margin-bottom:20px;">Una plataforma,<br>tu negocio completo</h2>
+  <p style="font-size:17px; max-width:700px; line-height:1.8;">StockFlow RD integra inventario, ventas, compras, facturación fiscal NCF y reportes DGII en un solo sistema pensado para las PYMEs dominicanas. Todo sincronizado en tiempo real.</p>
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:32px;">
+    <div style="padding:20px; background:rgba(255,255,255,0.05); border-radius:12px;">
+      <div style="font-size:28px; font-weight:800; color:#a78bfa;">55</div>
+      <div style="font-size:13px; color:rgba(255,255,255,0.5);">Productos registrados</div>
+    </div>
+    <div style="padding:20px; background:rgba(255,255,255,0.05); border-radius:12px;">
+      <div style="font-size:28px; font-weight:800; color:#a78bfa;">7</div>
+      <div style="font-size:13px; color:rgba(255,255,255,0.5);">Ventas realizadas</div>
+    </div>
+    <div style="padding:20px; background:rgba(255,255,255,0.05); border-radius:12px;">
+      <div style="font-size:28px; font-weight:800; color:#a78bfa;">8</div>
+      <div style="font-size:13px; color:rgba(255,255,255,0.5);">Categorías activas</div>
+    </div>
+  </div>
+  <div class="slide-number" style="color:rgba(255,255,255,0.3);">02 / 12</div>
+</div>
+
+<!-- ==================== DASHBOARD ==================== -->
+<div class="slide">
+  <div class="app-header">
+    <div class="brand"><div class="logo">SF</div> StockFlow RD</div>
+    <div class="nav">
+      <a href="#" class="active">Dashboard</a>
+      <a href="#">Productos</a>
+      <a href="#">Ventas</a>
+      <a href="#">Compras</a>
+      <a href="#">Clientes</a>
+      <a href="#">Reportes</a>
+    </div>
+    <div class="user"><div class="avatar">EC</div> Elvis Carvajal</div>
+  </div>
+  <div class="page-header">
+    <div><h1>Dashboard</h1><p>Resumen general del negocio</p></div>
+  </div>
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num">RD$ 59,295</div>
+      <div class="label">Ventas totales</div>
+      <div class="change up">↑ 12% vs semana pasada</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">55</div>
+      <div class="label">Productos activos</div>
+      <div class="change up">✓ todos en stock</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">8</div>
+      <div class="label">Clientes registrados</div>
+      <div class="change up">↑ 2 nuevos esta semana</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">RD$ 9,042</div>
+      <div class="label">ITBIS acumulado</div>
+      <div class="change up">✓ declaración al día</div>
+    </div>
+  </div>
+  <div class="flex-row">
+    <div class="flex-2" style="background:#fff; border-radius:12px; border:1px solid #f1f5f9; padding:18px 20px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;">📈 Ventas de la semana</div>
+      <div class="chart-bar">
+        <div class="bar" style="height:30px;"></div>
+        <div class="bar" style="height:55px;"></div>
+        <div class="bar" style="height:40px;"></div>
+        <div class="bar" style="height:70px;"></div>
+        <div class="bar" style="height:45px;"></div>
+        <div class="bar" style="height:80px;"></div>
+        <div class="bar" style="height:35px;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:11px; color:#94a3b8; margin-top:4px;">
+        <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+      </div>
+    </div>
+    <div class="flex-1" style="background:#fff; border-radius:12px; border:1px solid #f1f5f9; padding:18px 20px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px;">🏆 Top productos</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div><div style="font-size:13px;font-weight:600;">Montecristo No. 2</div><div style="font-size:12px;color:#64748b;">RD$ 5,600 · 2 vendidos</div></div>
+        <div><div style="font-size:13px;font-weight:600;">Johnnie Walker Blue Label</div><div style="font-size:12px;color:#64748b;">RD$ 18,500 · 1 vendido</div></div>
+        <div><div style="font-size:13px;font-weight:600;">Macallan 18yr Sherry Oak</div><div style="font-size:12px;color:#64748b;">RD$ 38,000 · 1 vendido</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">03 / 12</div>
+</div>
+
+<!-- ==================== DASHBOARD DESCRIPTION ==================== -->
+<div class="slide slide-dark" style="justify-content:center; padding:0 80px;">
+  <div class="slide-tag" style="background:rgba(255,255,255,0.08); color:#a78bfa; border:1px solid rgba(255,255,255,0.1);">📊 Dashboard</div>
+  <h2 style="font-size:36px; margin-bottom:16px;">El panorama completo<br>de tu negocio en un vistazo</h2>
+  <p style="font-size:15px; max-width:700px; line-height:1.7; margin-bottom:20px;">El Dashboard centraliza todas las métricas clave para que tomes decisiones informadas sin buscar datos en mil lugares.</p>
+  <ul class="features-list" style="max-width:700px;">
+    <li>Ventas totales del período con variación porcentual</li>
+    <li>Productos más vendidos y alertas de stock bajo</li>
+    <li>ITBIS acumulado para declaración fiscal</li>
+    <li>Clientes nuevos registrados en la semana</li>
+    <li>Gráfico de ventas de los últimos 7 días</li>
+    <li>Acceso rápido a las funciones más usadas</li>
+  </ul>
+  <div class="slide-number" style="color:rgba(255,255,255,0.3);">04 / 12</div>
+</div>
+
+<!-- ==================== PRODUCTS ==================== -->
+<div class="slide">
+  <div class="app-header">
+    <div class="brand"><div class="logo">SF</div> StockFlow RD</div>
+    <div class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#" class="active">Productos</a>
+      <a href="#">Ventas</a>
+      <a href="#">Compras</a>
+      <a href="#">Clientes</a>
+      <a href="#">Reportes</a>
+    </div>
+    <div class="user"><div class="avatar">EC</div> Elvis Carvajal</div>
+  </div>
+  <div class="page-header">
+    <div><h1>Productos</h1><p>55 productos registrados</p></div>
+    <button class="btn">+ Nuevo producto</button>
+  </div>
+  <div class="table-wrap" style="margin-top:12px;">
+    <table>
+      <thead>
+        <tr><th>Producto</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>ITBIS</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="font-weight:600;">Cohiba Behike BHK 56</td><td>Puros Premium</td><td>RD$ 8,500</td><td><span class="badge badge-stock">12</span></td><td>18%</td></tr>
+        <tr><td style="font-weight:600;">Montecristo No. 2</td><td>Puros Premium</td><td>RD$ 2,800</td><td><span class="badge badge-stock-ok">30</span></td><td>18%</td></tr>
+        <tr><td style="font-weight:600;">Johnnie Walker Blue Label</td><td>Whisky</td><td>RD$ 18,500</td><td><span class="badge badge-stock-ok">6</span></td><td>18%</td></tr>
+        <tr><td style="font-weight:600;">Macallan 18yr Sherry Oak</td><td>Whisky</td><td>RD$ 38,000</td><td><span class="badge badge-stock">3</span></td><td>18%</td></tr>
+        <tr><td style="font-weight:600;">Brugal 1888 Gran Reserva</td><td>Ron</td><td>RD$ 3,500</td><td><span class="badge badge-stock-ok">15</span></td><td>18%</td></tr>
+        <tr><td style="font-weight:600;">Presidente Light</td><td>Cerveza</td><td>RD$ 150</td><td><span class="badge badge-stock-ok">200</span></td><td>18%</td></tr>
+        <tr><td style="font-weight:600;">Coca-Cola 355ml</td><td>Refrescos</td><td>RD$ 50</td><td><span class="badge badge-stock-ok">300</span></td><td>0%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="slide-number">05 / 12</div>
+</div>
+
+<!-- ==================== PRODUCTS DESCRIPTION ==================== -->
+<div class="slide slide-dark" style="justify-content:center; padding:0 80px;">
+  <div class="slide-tag" style="background:rgba(255,255,255,0.08); color:#a78bfa; border:1px solid rgba(255,255,255,0.1);">📦 Módulo de Productos</div>
+  <h2 style="font-size:36px; margin-bottom:16px;">Control total de tu<br>inventario de productos</h2>
+  <p style="font-size:15px; max-width:700px; line-height:1.7; margin-bottom:20px;">Gestiona tu catálogo con precios, categorías, ITBIS diferenciado y control de stock en tiempo real. Cada venta o compra ajusta el inventario automáticamente.</p>
+  <ul class="features-list" style="max-width:700px;">
+    <li>Catálogo ilimitado de productos con búsqueda y filtros</li>
+    <li>ITBIS configurable por producto (18%, 16%, 0%)</li>
+    <li>Categorías personalizables para organizar tu inventario</li>
+    <li>Alertas visuales de stock bajo con código de colores</li>
+    <li>Precio de venta con cálculo automático de ITBIS incluido</li>
+    <li>Kardex digital con historial completo de movimientos</li>
+  </ul>
+  <div class="slide-number" style="color:rgba(255,255,255,0.3);">06 / 12</div>
+</div>
+
+<!-- ==================== SALES ==================== -->
+<div class="slide">
+  <div class="app-header">
+    <div class="brand"><div class="logo">SF</div> StockFlow RD</div>
+    <div class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Productos</a>
+      <a href="#" class="active">Ventas</a>
+      <a href="#">Compras</a>
+      <a href="#">Clientes</a>
+      <a href="#">Reportes</a>
+    </div>
+    <div class="user"><div class="avatar">EC</div> Elvis Carvajal</div>
+  </div>
+  <div class="page-header">
+    <div><h1>Ventas</h1><p>7 ventas registradas · 2 pendientes de facturación</p></div>
+    <button class="btn">+ Nueva venta</button>
+  </div>
+  <div class="table-wrap" style="margin-top:12px;">
+    <table>
+      <thead>
+        <tr><th>NCF</th><th>Cliente</th><th>Total</th><th>ITBIS</th><th>Método</th><th>Fecha</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="badge badge-ncf">B0200000015</span></td><td>Juan Pablo Duarte</td><td style="font-weight:600;">RD$ 7,670</td><td>RD$ 1,170</td><td>Tarjeta</td><td>11/05/2026</td></tr>
+        <tr><td><span class="badge badge-ncf">B0200000016</span></td><td>Carlos M. Bautista</td><td style="font-weight:600;">RD$ 57,722</td><td>RD$ 8,802</td><td>Transferencia</td><td>13/05/2026</td></tr>
+        <tr><td><span class="badge badge-ncf">B0200000017</span></td><td>Roberto A. Peña</td><td style="font-weight:600;">RD$ 11,210</td><td>RD$ 1,710</td><td>Tarjeta</td><td>15/05/2026</td></tr>
+        <tr><td><span class="badge badge-ncf">B0100000001</span></td><td>Mireya Santos</td><td style="font-weight:600;">RD$ 4,720</td><td>RD$ 720</td><td>Efectivo</td><td>12/05/2026</td></tr>
+        <tr><td><span class="badge badge-ncf">B0100000002</span></td><td>Ana K. Jiménez</td><td style="font-weight:600;">RD$ 8,970</td><td>RD$ 1,368</td><td>Tarjeta</td><td>14/05/2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="slide-number">07 / 12</div>
+</div>
+
+<!-- ==================== SALES DESCRIPTION ==================== -->
+<div class="slide slide-dark" style="justify-content:center; padding:0 80px;">
+  <div class="slide-tag" style="background:rgba(255,255,255,0.08); color:#a78bfa; border:1px solid rgba(255,255,255,0.1);">🧾 Módulo de Ventas</div>
+  <h2 style="font-size:36px; margin-bottom:16px;">Facturación fiscal<br>sin complicaciones</h2>
+  <p style="font-size:15px; max-width:700px; line-height:1.7; margin-bottom:20px;">Registra ventas con generación automática de NCF, cálculo de ITBIS y descuento de inventario en tiempo real. Soporta facturación B01 (Consumidor Final) y B02 (Crédito Fiscal).</p>
+  <ul class="features-list" style="max-width:700px;">
+    <li>NCF tipo B01 y B02 con secuencia automática controlada</li>
+    <li>ITBIS calculado al instante según el tipo de producto</li>
+    <li>Selección de cliente con tipo de comprobante asociado</li>
+    <li>Múltiples métodos de pago (efectivo, tarjeta, transferencia)</li>
+    <li>Descuento automático del stock al confirmar la venta</li>
+    <li>Historial completo con búsqueda por NCF o cliente</li>
+  </ul>
+  <div class="slide-number" style="color:rgba(255,255,255,0.3);">08 / 12</div>
+</div>
+
+<!-- ==================== PURCHASES ==================== -->
+<div class="slide">
+  <div class="app-header">
+    <div class="brand"><div class="logo">SF</div> StockFlow RD</div>
+    <div class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Productos</a>
+      <a href="#">Ventas</a>
+      <a href="#" class="active">Compras</a>
+      <a href="#">Clientes</a>
+      <a href="#">Reportes</a>
+    </div>
+    <div class="user"><div class="avatar">EC</div> Elvis Carvajal</div>
+  </div>
+  <div class="page-header">
+    <div><h1>Compras</h1><p>4 compras registradas · 5 proveedores activos</p></div>
+    <button class="btn">+ Nueva compra</button>
+  </div>
+  <div class="table-wrap" style="margin-top:12px;">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Proveedor</th><th>Total</th><th>Productos</th><th>NCF</th><th>Fecha</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Dist. Nacional de Tabacos SRL</td><td style="font-weight:600;">RD$ 425,000</td><td>8 productos</td><td>E00100001</td><td>03/05/2026</td></tr>
+        <tr><td>2</td><td>Importadora de Licores Premium SRL</td><td style="font-weight:600;">RD$ 315,000</td><td>8 productos</td><td>E00100002</td><td>05/05/2026</td></tr>
+        <tr><td>3</td><td>Brugal & Co.</td><td style="font-weight:600;">RD$ 98,000</td><td>7 productos</td><td>E00100003</td><td>07/05/2026</td></tr>
+        <tr><td>4</td><td>Cervecería Nacional Dominicana</td><td style="font-weight:600;">RD$ 45,000</td><td>7 productos</td><td>E00100004</td><td>09/05/2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin:16px 28px; padding:14px 18px; background:#f0fdf4; border-radius:10px; border:1px solid #bbf7d0;">
+    <span style="font-weight:600; color:#059669;">✓</span>
+    <span style="font-size:13px; color:#15803d;"> Cada compra actualiza el inventario automáticamente. Costos registrados para calcular rentabilidad.</span>
+  </div>
+  <div class="slide-number">09 / 12</div>
+</div>
+
+<!-- ==================== CLIENTS ==================== -->
+<div class="slide">
+  <div class="app-header">
+    <div class="brand"><div class="logo">SF</div> StockFlow RD</div>
+    <div class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Productos</a>
+      <a href="#">Ventas</a>
+      <a href="#">Compras</a>
+      <a href="#" class="active">Clientes</a>
+      <a href="#">Reportes</a>
+    </div>
+    <div class="user"><div class="avatar">EC</div> Elvis Carvajal</div>
+  </div>
+  <div class="page-header">
+    <div><h1>Clientes</h1><p>8 clientes registrados · 4 crédito fiscal (B02)</p></div>
+    <button class="btn">+ Nuevo cliente</button>
+  </div>
+  <div class="table-wrap" style="margin-top:12px;">
+    <table>
+      <thead>
+        <tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Tipo</th><th>Compras</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="font-weight:600;">Juan Pablo Duarte</td><td>jpduarte@email.com</td><td>809-555-0101</td><td><span class="badge badge-admin">B02</span></td><td>3 ventas</td></tr>
+        <tr><td style="font-weight:600;">Carlos M. Bautista</td><td>cbautista@email.com</td><td>829-555-0103</td><td><span class="badge badge-admin">B02</span></td><td>1 venta</td></tr>
+        <tr><td style="font-weight:600;">Mireya Santos</td><td>msantos@email.com</td><td>809-555-0102</td><td><span class="badge badge-employee">B01</span></td><td>1 venta</td></tr>
+        <tr><td style="font-weight:600;">Ana K. Jiménez</td><td>akjimenez@email.com</td><td>849-555-0104</td><td><span class="badge badge-employee">B01</span></td><td>1 venta</td></tr>
+        <tr><td style="font-weight:600;">Roberto A. Peña</td><td>rapena@email.com</td><td>809-555-0105</td><td><span class="badge badge-admin">B02</span></td><td>1 venta</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="slide-number">10 / 12</div>
+</div>
+
+<!-- ==================== DGII ==================== -->
+<div class="slide">
+  <div class="app-header">
+    <div class="brand"><div class="logo">SF</div> StockFlow RD</div>
+    <div class="nav">
+      <a href="#">Dashboard</a>
+      <a href="#">Productos</a>
+      <a href="#">Ventas</a>
+      <a href="#">Compras</a>
+      <a href="#">Clientes</a>
+      <a href="#" class="active">Reportes</a>
+    </div>
+    <div class="user"><div class="avatar">EC</div> Elvis Carvajal</div>
+  </div>
+  <div class="page-header">
+    <div><h1>Reportes DGII</h1><p>Reportes fiscales 606 y 607 · Ganancias del período</p></div>
+    <button class="btn">Exportar 607</button>
+  </div>
+  <div class="flex-row" style="padding-top:12px;">
+    <div class="flex-1" style="background:#fff; border-radius:12px; border:1px solid #f1f5f9; padding:20px;">
+      <div style="font-size:16px;font-weight:700;color:#059669;margin-bottom:12px;">📑 Reporte 606 — Compras</div>
+      <div class="detail-row"><span class="l">Período</span><span class="r">Mayo 2026</span></div>
+      <div class="detail-row"><span class="l">Compras registradas</span><span class="r">4</span></div>
+      <div class="detail-row"><span class="l">Total compras</span><span class="r">RD$ 883,000</span></div>
+      <div class="detail-row"><span class="l">ITBIS recuperable</span><span class="r">RD$ 134,746</span></div>
+    </div>
+    <div class="flex-1" style="background:#fff; border-radius:12px; border:1px solid #f1f5f9; padding:20px;">
+      <div style="font-size:16px;font-weight:700;color:#4f46e5;margin-bottom:12px;">📑 Reporte 607 — Ventas</div>
+      <div class="detail-row"><span class="l">Período</span><span class="r">Mayo 2026</span></div>
+      <div class="detail-row"><span class="l">Ventas registradas</span><span class="r">7</span></div>
+      <div class="detail-row"><span class="l">Total ventas</span><span class="r">RD$ 59,295</span></div>
+      <div class="detail-row"><span class="l">ITBIS cobrado</span><span class="r">RD$ 9,042</span></div>
+    </div>
+    <div class="flex-1" style="background:#fff; border-radius:12px; border:1px solid #f1f5f9; padding:20px;">
+      <div style="font-size:16px;font-weight:700;color:#ca8a04;margin-bottom:12px;">📊 Ganancias del período</div>
+      <div class="detail-row"><span class="l">Margen bruto</span><span class="r" style="color:#059669;">+42.5%</span></div>
+      <div class="detail-row"><span class="l">Total ganancia</span><span class="r" style="color:#059669;">RD$ 25,200</span></div>
+      <div class="detail-row"><span class="l">Producto más rentable</span><span class="r">Macallan 18yr</span></div>
+      <div class="detail-row"><span class="l">Categoría top</span><span class="r">Whisky Premium</span></div>
+    </div>
+  </div>
+  <div class="slide-number">11 / 12</div>
+</div>
+
+<!-- ==================== CLOSING ==================== -->
+<div class="slide slide-end">
+  <div style="font-size:64px;margin-bottom:20px;">🚀</div>
+  <h2>¿Listo para digitalizar tu negocio?</h2>
+  <p>StockFlow RD — el ERP dominicano diseñado para PYMEs que quieren crecer sin complicaciones fiscales</p>
+  <div style="margin-top:32px; padding:16px 40px; background:#fff; color:#4f46e5; border-radius:60px; font-size:18px; font-weight:700; box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+    Solicita una demostración
+  </div>
+  <div style="margin-top:24px; font-size:14px; color:rgba(255,255,255,0.4);">contacto@stockflow.com · WhatsApp: +1 (809) 555-0100</div>
+  <div class="slide-number" style="color:rgba(255,255,255,0.3);">12 / 12</div>
+</div>
+
+</body>
+</html>

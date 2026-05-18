@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StockFlow RD — Presentación</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #f8fafc;
+    color: #0f172a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 1280px;
+    height: 720px;
+    padding: 60px 80px;
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  /* === SLIDE 1 — PORTADA === */
+  .slide-cover {
+    background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 50%, #7c3aed 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+  }
+  .slide-cover .logo {
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px; font-weight: 900;
+    margin-bottom: 32px;
+  }
+  .slide-cover h1 { font-size: 64px; font-weight: 900; letter-spacing: -2px; margin-bottom: 12px; }
+  .slide-cover h1 span { background: linear-gradient(135deg, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .slide-cover p { font-size: 22px; color: rgba(255,255,255,0.7); max-width: 700px; line-height: 1.6; }
+  .slide-cover .meta {
+    margin-top: 48px;
+    padding: 12px 32px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50px;
+    font-size: 16px; color: rgba(255,255,255,0.6);
+  }
+
+  /* === SLIDE 2 — EL PROBLEMA === */
+  .slide-problem {
+    background: #fff;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .slide-problem .tag {
+    display: inline-flex; align-self: flex-start;
+    padding: 8px 18px; background: #fef2f2; color: #dc2626;
+    border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px;
+  }
+  .slide-problem h2 { font-size: 44px; font-weight: 800; margin-bottom: 32px; letter-spacing: -1px; }
+  .slide-problem .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .slide-problem .card {
+    padding: 28px; background: #fef2f2; border-radius: 16px; border: 1px solid #fecaca;
+  }
+  .slide-problem .card .icon { font-size: 32px; margin-bottom: 12px; }
+  .slide-problem .card h3 { font-size: 20px; font-weight: 700; color: #991b1b; margin-bottom: 8px; }
+  .slide-problem .card p { font-size: 15px; color: #7f1d1d; line-height: 1.6; }
+
+  /* === SLIDE 3 — LA SOLUCIÓN === */
+  .slide-solution {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #fff;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .slide-solution .tag { display: inline-flex; align-self: flex-start; padding: 8px 18px; background: rgba(255,255,255,0.08); color: #a78bfa; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+  .slide-solution h2 { font-size: 44px; font-weight: 800; margin-bottom: 28px; letter-spacing: -1px; }
+  .slide-solution h2 span { color: #a78bfa; }
+  .slide-solution .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .slide-solution .card {
+    padding: 28px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;
+  }
+  .slide-solution .card .icon { font-size: 36px; margin-bottom: 12px; }
+  .slide-solution .card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .slide-solution .card p { font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+  /* === SLIDE 4 — FUNCIONALIDADES === */
+  .slide-features { background: #fff; display: flex; flex-direction: column; justify-content: center; }
+  .slide-features .tag { display: inline-flex; align-self: flex-start; padding: 8px 18px; background: #eef2ff; color: #4f46e5; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px; }
+  .slide-features h2 { font-size: 40px; font-weight: 800; margin-bottom: 32px; letter-spacing: -1px; }
+  .slide-features h2 span { color: #4f46e5; }
+  .slide-features .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .slide-features .item {
+    display: flex; gap: 16px; padding: 20px 24px;
+    background: #f8fafc; border-radius: 14px; border: 1px solid #f1f5f9;
+  }
+  .slide-features .item .num {
+    width: 40px; height: 40px; background: #4f46e5; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 16px; flex-shrink: 0;
+  }
+  .slide-features .item h4 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .slide-features .item p { font-size: 14px; color: #64748b; line-height: 1.5; }
+
+  /* === SLIDE 5 — NCF Y DGII === */
+  .slide-dgii { background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; display: flex; flex-direction: column; justify-content: center; }
+  .slide-dgii .tag { display: inline-flex; align-self: flex-start; padding: 8px 18px; background: rgba(255,255,255,0.08); color: #34d399; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.1); }
+  .slide-dgii h2 { font-size: 40px; font-weight: 800; margin-bottom: 28px; }
+  .slide-dgii h2 span { color: #34d399; }
+  .slide-dgii .content { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .slide-dgii .block h3 { font-size: 20px; font-weight: 700; color: #34d399; margin-bottom: 12px; }
+  .slide-dgii .block ul { list-style: none; }
+  .slide-dgii .block li {
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 15px; color: rgba(255,255,255,0.7); display: flex; gap: 10px;
+  }
+  .slide-dgii .block li::before { content: '✓'; color: #34d399; font-weight: 700; }
+
+  /* === SLIDE 6 — POR QUÉ NOSOTROS === */
+  .slide-why { background: #fff; display: flex; flex-direction: column; justify-content: center; }
+  .slide-why .tag { display: inline-flex; align-self: flex-start; padding: 8px 18px; background: #f0fdf4; color: #059669; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px; }
+  .slide-why h2 { font-size: 40px; font-weight: 800; margin-bottom: 32px; }
+  .slide-why h2 span { color: #059669; }
+  .slide-why .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .slide-why .card {
+    padding: 28px; background: #f0fdf4; border-radius: 16px; border: 1px solid #bbf7d0;
+  }
+  .slide-why .card .icon { font-size: 28px; margin-bottom: 10px; }
+  .slide-why .card h3 { font-size: 18px; font-weight: 700; color: #166534; margin-bottom: 6px; }
+  .slide-why .card p { font-size: 14px; color: #15803d; line-height: 1.5; }
+
+  /* === SLIDE 7 — PRECIOS / PLANES === */
+  .slide-plans { background: #fff; display: flex; flex-direction: column; justify-content: center; }
+  .slide-plans .tag { display: inline-flex; align-self: flex-start; padding: 8px 18px; background: #fefce8; color: #a16207; border-radius: 50px; font-size: 14px; font-weight: 600; margin-bottom: 20px; }
+  .slide-plans h2 { font-size: 40px; font-weight: 800; margin-bottom: 32px; }
+  .slide-plans .cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .slide-plans .plan {
+    padding: 32px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center;
+  }
+  .slide-plans .plan.featured {
+    border-color: #4f46e5; background: #f8fafc;
+    transform: scale(1.05);
+    box-shadow: 0 8px 32px rgba(79,70,229,0.15);
+  }
+  .slide-plans .plan h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .slide-plans .plan .price { font-size: 36px; font-weight: 900; color: #4f46e5; margin-bottom: 4px; }
+  .slide-plans .plan .period { font-size: 14px; color: #94a3b8; margin-bottom: 20px; }
+  .slide-plans .plan ul { list-style: none; text-align: left; }
+  .slide-plans .plan li {
+    padding: 8px 0; font-size: 14px; color: #475569; display: flex; gap: 8px; border-bottom: 1px solid #f1f5f9;
+  }
+  .slide-plans .plan li::before { content: '✓'; color: #4f46e5; font-weight: 700; }
+
+  /* === SLIDE 8 — CIERRE === */
+  .slide-end {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: #fff;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+  }
+  .slide-end h2 { font-size: 52px; font-weight: 900; margin-bottom: 16px; }
+  .slide-end p { font-size: 22px; color: rgba(255,255,255,0.8); max-width: 600px; line-height: 1.6; margin-bottom: 32px; }
+  .slide-end .contact {
+    display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+  }
+  .slide-end .contact-item { font-size: 18px; color: rgba(255,255,255,0.7); }
+  .slide-end .contact-item strong { color: #fff; display: block; margin-bottom: 4px; }
+
+  /* === FOOTER/SLIDE NUMBER === */
+  .slide-number {
+    position: absolute; bottom: 28px; right: 40px;
+    font-size: 13px; color: #94a3b8; font-weight: 500;
+  }
+  .slide-cover .slide-number, .slide-end .slide-number { color: rgba(255,255,255,0.3); }
+  .slide-solution .slide-number, .slide-dgii .slide-number { color: rgba(255,255,255,0.3); }
+
+  /* === PRINT === */
+  @media print {
+    body { background: #fff; }
+    .slide { box-shadow: none; margin: 0; width: 100%; height: auto; min-height: 720px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: PORTADA -->
+<div class="slide slide-cover">
+  <div class="logo">SF</div>
+  <h1>StockFlow <span>RD</span></h1>
+  <p>ERP inteligente para PYMEs dominicanas — Control de inventario, ventas, NCF y reportes DGII</p>
+  <div class="meta">Presentación comercial · 2026</div>
+  <div class="slide-number">01 / 08</div>
+</div>
+
+<!-- SLIDE 2: PROBLEMA -->
+<div class="slide slide-problem">
+  <div class="tag">⚠️ El problema</div>
+  <h2>¿Por qué muchos negocios en RD<br>pierden dinero sin saberlo?</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">📝</div>
+      <h3>Facturación manual</h3>
+      <p>Facturas escritas a mano o en Excel que se pierden, se duplican o no cumplen con los requisitos de la DGII.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📦</div>
+      <h3>Inventario descontrolado</h3>
+      <p>No sabes exactamente qué tienes, qué se vendió o qué hace falta comprar. Roturas de stock o sobreinventario.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🧾</div>
+      <h3>Multas DGII</h3>
+      <p>Reportes 606/607 fuera de tiempo, NCF mal emitidos, ITBIS mal calculado. Las multas pueden ser de hasta 50 salarios mínimos.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h3>Sin visibilidad</h3>
+      <p>No sabes si estás ganando o perdiendo dinero. No hay métricas claras de ventas, márgenes o rentabilidad.</p>
+    </div>
+  </div>
+  <div class="slide-number">02 / 08</div>
+</div>
+
+<!-- SLIDE 3: SOLUCIÓN -->
+<div class="slide slide-solution">
+  <div class="tag">✅ La solución</div>
+  <h2>StockFlow <span>RD</span> resuelve todo esto<br>en un solo sistema</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">📦</div>
+      <h3>Inventario inteligente</h3>
+      <p>Kardex digital, alertas de bajo stock, movimientos automáticos con cada venta y compra.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🧾</div>
+      <h3>Facturación fiscal</h3>
+      <p>NCF tipo B01 y B02 con ITBIS calculado automáticamente. Secuencias controladas por rango y vigencia.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📑</div>
+      <h3>Reportes DGII</h3>
+      <p>Genera los reportes 606 y 607 con un clic. Formato oficial listo para enviar a la DGII.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h3>Dashboard en vivo</h3>
+      <p>Ventas del día, productos más vendidos, rentabilidad, ITBIS acumulado. Todo en tiempo real.</p>
+    </div>
+    <div class="card">
+      <div class="icon">👥</div>
+      <h3>Usuarios y roles</h3>
+      <p>Administradores y empleados con permisos diferenciados. Cada quien ve lo que necesita.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📱</div>
+      <h3>Acceso web</h3>
+      <p>Funciona en cualquier navegador. Escritorio, tablet o móvil. Sin instalaciones complicadas.</p>
+    </div>
+  </div>
+  <div class="slide-number">03 / 08</div>
+</div>
+
+<!-- SLIDE 4: FUNCIONALIDADES -->
+<div class="slide slide-features">
+  <div class="tag">⚡ Funcionalidades clave</div>
+  <h2>Todo lo que necesitas para <span>digitalizar</span> tu negocio</h2>
+  <div class="grid">
+    <div class="item">
+      <div class="num">01</div>
+      <div><h4>Control de inventario</h4><p>Kardex completo por producto. Entradas, salidas y ajustes con saldo automático.</p></div>
+    </div>
+    <div class="item">
+      <div class="num">02</div>
+      <div><h4>Gestión de ventas</h4><p>Registra ventas con NCF automático, ITBIS calculado y descuento de stock al instante.</p></div>
+    </div>
+    <div class="item">
+      <div class="num">03</div>
+      <div><h4>Compras y proveedores</h4><p>Registra compras, asocia productos, controla costos y actualiza inventario automáticamente.</p></div>
+    </div>
+    <div class="item">
+      <div class="num">04</div>
+      <div><h4>NCF automáticos</h4><p>B01 para consumidor final, B02 para crédito fiscal. Secuencia y vigencia controladas.</p></div>
+    </div>
+    <div class="item">
+      <div class="num">05</div>
+      <div><h4>Reportes DGII (606/607)</h4><p>Exporta los reportes que exige la DGII en formato listo para enviar.</p></div>
+    </div>
+    <div class="item">
+      <div class="num">06</div>
+      <div><h4>Dashboard y métricas</h4><p>Ventas totales, rentabilidad, productos top, ITBIS acumulado, alertas de stock bajo.</p></div>
+    </div>
+    <div class="item">
+      <div class="num">07</div>
+      <div><h4>Clientes</h4><p>Base de datos de clientes con historial de ventas y tipo de comprobante (B01/B02).</p></div>
+    </div>
+    <div class="item">
+      <div class="num">08</div>
+      <div><h4>Seguridad y roles</h4><p>JWT con renovación automática. Rate limiting. Roles admin y empleado con permisos granulares.</p></div>
+    </div>
+  </div>
+  <div class="slide-number">04 / 08</div>
+</div>
+
+<!-- SLIDE 5: NCF + DGII -->
+<div class="slide slide-dgii">
+  <div class="tag">🇩🇴 Cumplimiento DGII</div>
+  <h2>Cumplimiento fiscal dominicano<br><span>sin dolores de cabeza</span></h2>
+  <div class="content">
+    <div class="block">
+      <h3>🧾 Comprobantes Fiscales (NCF)</h3>
+      <ul>
+        <li>B01 — Consumidor Final (ventas al detal sin RNC)</li>
+        <li>B02 — Crédito Fiscal (ventas a empresas con RNC)</li>
+        <li>Secuencia numérica auto-controlada por rango y vigencia</li>
+        <li>ITBIS calculado automáticamente según el tipo de producto</li>
+        <li>Anulación de facturas con restauración de stock</li>
+      </ul>
+    </div>
+    <div class="block">
+      <h3>📑 Reportes mensuales</h3>
+      <ul>
+        <li>Reporte 606 — Compras del mes (proveedores)</li>
+        <li>Reporte 607 — Ventas del mes (clientes)</li>
+        <li>Formato oficial DGII listo para enviar</li>
+        <li>Reporte de ganancias con ITBIS desglosado</li>
+        <li>Historial completo para auditorías fiscales</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">05 / 08</div>
+</div>
+
+<!-- SLIDE 6: POR QUÉ NOSOTROS -->
+<div class="slide slide-why">
+  <div class="tag">🌟 ¿Por qué StockFlow RD?</div>
+  <h2>Lo que nos hace <span>diferentes</span></h2>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">🇩🇴</div>
+      <h3>Hecho en RD para RD</h3>
+      <p>No es una adaptación de un ERP extranjero. Nació pensando en la DGII, el NCF, el ITBIS y las necesidades del negocio dominicano.</p>
+    </div>
+    <div class="card">
+      <div class="icon">💰</div>
+      <h3>Sin costos ocultos</h3>
+      <p>Precio único mensual. Sin límite de productos, sin cargo por usuario extra, sin sorpresas.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🚀</div>
+      <h3>Implementación rápida</h3>
+      <p>En menos de 1 hora tu negocio está funcionando. Datos iniciales, productos, clientes. Listo para vender.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔒</div>
+      <h3>Seguro y confiable</h3>
+      <p>JWT seguro, contraseñas encriptadas, rate limiting, backups automáticos. Tu información está protegida.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📱</div>
+      <h3>Acceso desde cualquier lugar</h3>
+      <p>Alojado en la nube con Docker. Funciona en cualquier dispositivo con internet. Sin instalaciones.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎯</div>
+      <h3>Diseñado para PYMEs</h3>
+      <p>Interfaz limpia y sencilla. Curva de aprendizaje mínima. Tu equipo lo usará desde el día 1.</p>
+    </div>
+  </div>
+  <div class="slide-number">06 / 08</div>
+</div>
+
+<!-- SLIDE 7: PLANES -->
+<div class="slide slide-plans">
+  <div class="tag">💲 Planes</div>
+  <h2>Precios pensados para tu negocio</h2>
+  <div class="cards">
+    <div class="plan">
+      <h3>Básico</h3>
+      <div class="price">RD$1,500</div>
+      <div class="period">/mes</div>
+      <ul>
+        <li>Hasta 200 productos</li>
+        <li>Hasta 3 usuarios</li>
+        <li>Inventario básico</li>
+        <li>Ventas + NCF</li>
+        <li>Soporte por email</li>
+      </ul>
+    </div>
+    <div class="plan featured">
+      <h3>Profesional</h3>
+      <div class="price">RD$3,500</div>
+      <div class="period">/mes</div>
+      <ul>
+        <li>Productos ilimitados</li>
+        <li>Usuarios ilimitados</li>
+        <li>Inventario + Kardex + Alertas</li>
+        <li>Ventas + Compras + NCF</li>
+        <li>Reportes DGII 606/607</li>
+        <li>Dashboard + métricas</li>
+        <li>Soporte prioritario</li>
+      </ul>
+    </div>
+    <div class="plan">
+      <h3>Enterprise</h3>
+      <div class="price">RD$7,500</div>
+      <div class="period">/mes</div>
+      <ul>
+        <li>Todo el plan Profesional</li>
+        <li>Servidor dedicado</li>
+        <li>SSL personalizado</li>
+        <li>Backups diarios</li>
+        <li>SLA 99.9%</li>
+        <li>Capacitación presencial</li>
+        <li>Soporte 24/7</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-number">07 / 08</div>
+</div>
+
+<!-- SLIDE 8: CIERRE -->
+<div class="slide slide-end">
+  <h2>¿Listo para digitalizar<br>tu negocio?</h2>
+  <p>StockFlow RD — el ERP dominicano que entiende tus necesidades fiscales y de inventario</p>
+  <div class="contact">
+    <div class="contact-item">
+      <strong>📧 Email</strong>
+      contacto@stockflow.com
+    </div>
+    <div class="contact-item">
+      <strong>📱 WhatsApp</strong>
+      +1 (809) 555-0100
+    </div>
+    <div class="contact-item">
+      <strong>🌐 Web</strong>
+      stockflow.com
+    </div>
+  </div>
+  <div style="margin-top:48px; padding:8px 24px; border:1px solid rgba(255,255,255,0.15); border-radius:50px; font-size:14px; color:rgba(255,255,255,0.4);">
+    Solicita una demostración gratuita · Sin compromiso
+  </div>
+  <div class="slide-number">08 / 08</div>
+</div>
+
+</body>
+</html>
