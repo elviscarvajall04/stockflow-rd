@@ -26,14 +26,10 @@ const getClientById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    console.log("CLIENT ID:", id);
-
     const client = await pool.query(
       "SELECT * FROM clients WHERE id = $1",
       [id]
     );
-
-    console.log("CLIENT RESULT:", client.rows);
 
     if (client.rows.length === 0) {
       return res.status(404).json({
@@ -59,12 +55,8 @@ const getClientById = async (req, res) => {
       ),
     });
   } catch (error) {
-    console.error("GET CLIENT ERROR:", error);
-
-    res.status(500).json({
-      message: "Error obteniendo cliente",
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: "Error obteniendo cliente" });
   }
 };
 
@@ -84,13 +76,8 @@ const createClient = async (req, res) => {
       client: result.rows[0],
     });
   } catch (error) {
-console.error("CREATE CLIENT ERROR:", error);
-
-
-    res.status(500).json({ 
-    
-        message: "Error creando cliente", error: error.message,
-     });
+    console.error(error);
+    res.status(500).json({ message: "Error creando cliente" });
   }
 };
 

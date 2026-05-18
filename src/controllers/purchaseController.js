@@ -4,7 +4,8 @@ const { recordMovement } = require("./inventoryController");
 const createPurchase = async (req, res) => {
   const client = await pool.connect();
   try {
-    const { supplier_id, user_id, items, ncf, notes } = req.body;
+    const { supplier_id, items, ncf, notes } = req.body;
+    const user_id = req.user.id;
 
     if (!supplier_id) {
       return res.status(400).json({ message: "El proveedor es obligatorio" });

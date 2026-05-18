@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const path = require("path");
 require("dotenv").config();
 
@@ -18,8 +20,24 @@ const inventoryRoutes = require("./routes/inventoryRoutes");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",")
+  : ["http://localhost:5173", "http://localhost:3000"];
+
+app.use(helmet());
+app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(express.json({ limit: "5mb" }));
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { message: "Demasiados intentos. Intenta de nuevo en 15 minutos." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {

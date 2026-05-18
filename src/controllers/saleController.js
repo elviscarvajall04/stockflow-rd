@@ -7,12 +7,13 @@ const createSale = async (req, res) => {
 
   try {
     const {
-      user_id,
       items,
       payment_method,
       payment_method_id,
       client_id,
     } = req.body;
+
+    const user_id = req.user.id;
 
     if (!user_id) {
       return res.status(400).json({ message: "El usuario es obligatorio" });
